@@ -22,12 +22,54 @@ input:focus, select:focus, textarea:focus {
 
 ::placeholder { color: #94a3b8; }
 
+/* Animations */
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes slideup { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slidedown { from { transform: translateY(-12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scalein { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+@keyframes toast-in { from { transform: translateY(20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes toast-out { from { transform: translateY(0) scale(1); opacity: 1; } to { transform: translateY(20px) scale(0.95); opacity: 0; } }
 
-.jp-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
-.jp-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
-
-.animate-slideup { animation: slideup .3s ease; }
+.animate-slideup { animation: slideup .3s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slidedown { animation: slidedown .25s cubic-bezier(0.16, 1, 0.3, 1); }
 .animate-fadein { animation: fadein .3s ease; }
+.animate-scalein { animation: scalein .25s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+
+/* Skeleton loading shimmer */
+.skeleton {
+  background: linear-gradient(90deg, #eef0f6 25%, #f5f6fb 50%, #eef0f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Button press effect */
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+button {
+  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Page transition */
+main > * {
+  animation: fadein 0.2s ease;
+}
+
+/* Scrollbar */
+.jp-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+.jp-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+.jp-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* Toast animation */
+.toast-enter { animation: toast-in .3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Card hover lift for desktop */
+@media (min-width: 768px) {
+  .card-hover { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(15,23,42,.08); }
+}
