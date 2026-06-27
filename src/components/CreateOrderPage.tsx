@@ -131,7 +131,11 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
             <h3 className="m-0 text-[15px] font-bold">Data Customer & Batch</h3>
           </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3.5">
-            <div><label className={lblCls}>No WhatsApp <span className="text-[#ef4444]">*</span></label><input value={d.phone} onChange={e => handlePhoneChange(e.target.value)} placeholder="08xxxx" className={inpCls} /></div>
+            <div>
+              <label className={lblCls}>No WhatsApp <span className="text-[#ef4444]">*</span></label>
+              <input value={d.phone} onChange={e => handlePhoneChange(e.target.value)} placeholder="08xxxx" className={inpCls} />
+              <p className="m-0 mt-1 text-[10.5px] text-[#94a3b8] leading-snug">Jika nomor sudah terdaftar, nama &amp; data lainnya otomatis terisi.</p>
+            </div>
             <div><label className={lblCls}>Nama Customer <span className="text-[#ef4444]">*</span></label><input value={d.name} onChange={e => onDraftField('name', e.target.value)} placeholder="cth. Rina Pratiwi" className={inpCls} /></div>
             <div><label className={lblCls}>Alamat</label><input value={d.address} onChange={e => onDraftField('address', e.target.value)} placeholder="Kota / alamat" className={inpCls} /></div>
             <div><label className={lblCls}>Instagram</label><input value={d.instagram} onChange={e => onDraftField('instagram', e.target.value)} placeholder="@username" className={inpCls} /></div>
