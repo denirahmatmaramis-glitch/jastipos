@@ -231,11 +231,11 @@ export default function JastipApp() {
     <div className="flex min-h-screen">
       <Sidebar route={state.route} onNav={nav} onLogout={handleLogout} plan={state.plan} orderCount={state.orders.length} />
 
-      <main className="jp-scroll flex-1 min-w-0 p-[26px_30px] max-md:p-[18px_16px_96px] max-h-screen overflow-y-auto">
-        <div className="flex items-start justify-between gap-4 mb-[22px] flex-wrap">
+      <main className="jp-scroll flex-1 min-w-0 p-[26px_30px] max-md:p-[14px_14px_80px] max-h-screen overflow-y-auto">
+        <div className="flex items-start justify-between gap-3 mb-4 md:mb-[22px] flex-wrap">
           <div>
-            <h1 className="m-0 text-[23px] font-extrabold tracking-tight">{pageTitle}</h1>
-            <p className="mt-1 mb-0 text-[#64748b] text-[13px]">{pageSubtitle}</p>
+            <h1 className="m-0 text-[19px] md:text-[23px] font-extrabold tracking-tight">{pageTitle}</h1>
+            <p className="mt-0.5 md:mt-1 mb-0 text-[#64748b] text-[12px] md:text-[13px] hidden md:block">{pageSubtitle}</p>
           </div>
           <button onClick={() => nav('create')} className="flex items-center gap-[7px] py-[11px] px-4 border-none rounded-[11px] bg-[#4f46e5] text-white text-[13.5px] font-bold cursor-pointer whitespace-nowrap hover:bg-[#4338ca] transition-colors">
             <PlusIcon />Buat Order

@@ -70,7 +70,8 @@ export default function CustomersPage({ customers, orders, search, onSearch, onA
         </div>
         <button onClick={() => setShowAdd(true)} className="py-[11px] px-4 border-none rounded-[11px] bg-[#4f46e5] text-white text-[13.5px] font-bold cursor-pointer whitespace-nowrap hover:bg-[#4338ca] transition-colors">+ Tambah Customer</button>
       </div>
-      <div className="bg-white border border-[#eef0f6] rounded-2xl overflow-hidden">
+      {/* Desktop: tabel */}
+      <div className="hidden md:block bg-white border border-[#eef0f6] rounded-2xl overflow-hidden">
         <div className="jp-scroll overflow-x-auto">
           <table className="w-full border-collapse min-w-[680px]">
             <thead>
@@ -116,6 +117,40 @@ export default function CustomersPage({ customers, orders, search, onSearch, onA
             <div className="text-[12.5px] text-[#94a3b8] mt-1">Coba kata kunci lain atau tambah customer baru.</div>
           </div>
         )}
+      </div>
+
+      {/* Mobile: card list */}
+      <div className="md:hidden flex flex-col gap-2">
+        {filtered.length === 0 && (
+          <div className="bg-white border border-[#eef0f6] rounded-[14px] py-10 text-center">
+            <div className="text-[28px] mb-2">🔍</div>
+            <div className="text-[13px] font-bold">Customer tidak ditemukan</div>
+            <div className="text-[12px] text-[#94a3b8] mt-1">Coba kata kunci lain atau tambah customer baru.</div>
+          </div>
+        )}
+        {filtered.map((c, i) => {
+          const orderCount = orders.filter(o => o.customerPhone.replace(/\D/g, '') === c.phone.replace(/\D/g, '') || o.customerName === c.name).length;
+          const [avBg, avColor] = avPal[i % 5];
+          return (
+            <div key={c.id} className="bg-white border border-[#eef0f6] rounded-[14px] p-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-[38px] h-[38px] rounded-full flex items-center justify-center font-bold text-[14px] shrink-0" style={{ background: avBg, color: avColor }}>{c.name[0]}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[14px] font-semibold">{c.name}</div>
+                  <div className="text-[11.5px] text-[#94a3b8] mt-[1px]">{c.phone} · {c.address || '-'}</div>
+                  <div className="flex items-center gap-2 mt-[2px]">
+                    {c.instagram && <span className="text-[11px] text-[#6366f1]">{c.instagram}</span>}
+                    <span className="text-[11px] text-[#475569] font-semibold">{orderCount} order</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-3">
+                <button onClick={() => window.open(waLink(c.phone, `Halo Kak ${c.name}`), '_blank')} className="flex-1 py-2 border border-[#d1fae5] bg-[#ecfdf5] text-[#059669] rounded-[10px] cursor-pointer text-[12px] font-bold text-center">Chat WA</button>
+                <button onClick={() => { setDetail(c); setEditing(false); }} className="flex-1 py-2 border border-[#e2e8f0] bg-white text-[#475569] rounded-[10px] cursor-pointer text-[12px] font-bold text-center active:bg-[#f8fafc]">Detail</button>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Tambah Customer modal */}

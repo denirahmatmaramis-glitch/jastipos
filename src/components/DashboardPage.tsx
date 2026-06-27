@@ -28,23 +28,27 @@ export default function DashboardPage({ orders, onOpenOrder, onGoOrders }: Props
 
   return (
     <>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3.5">
+      {/* Stat cards — 2 kolom di mobile, auto-fit di desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-2.5 md:gap-3.5">
         {statCards.map((s, i) => (
-          <div key={i} className="bg-white border border-[#eef0f6] rounded-[15px] py-[17px] px-[18px] relative overflow-hidden">
+          <div key={i} className="bg-white border border-[#eef0f6] rounded-[13px] md:rounded-[15px] py-3 px-3.5 md:py-[17px] md:px-[18px] relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full" style={{ background: s.accent }} />
-            <div className="text-xs text-[#64748b] font-semibold">{s.label}</div>
-            <div className="text-[23px] font-extrabold mt-1.5 tracking-tight" style={{ color: s.valColor }}>{s.value}</div>
-            <div className="text-[11.5px] text-[#94a3b8] mt-[3px]">{s.hint}</div>
+            <div className="text-[10.5px] md:text-xs text-[#64748b] font-semibold">{s.label}</div>
+            <div className="text-[19px] md:text-[23px] font-extrabold mt-1 md:mt-1.5 tracking-tight" style={{ color: s.valColor }}>{s.value}</div>
+            <div className="text-[10px] md:text-[11.5px] text-[#94a3b8] mt-[2px]">{s.hint}</div>
           </div>
         ))}
       </div>
 
+      {/* Order terbaru — card di mobile, tabel di desktop */}
       <div className="bg-white border border-[#eef0f6] rounded-2xl mt-[18px] overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-[18px] border-b border-[#f1f5f9]">
-          <h2 className="m-0 text-[15px] font-bold">Order Terbaru</h2>
-          <a onClick={onGoOrders} className="text-[#4f46e5] text-[12.5px] font-semibold cursor-pointer no-underline">Lihat semua →</a>
+        <div className="flex items-center justify-between px-4 md:px-5 py-[14px] md:py-[18px] border-b border-[#f1f5f9]">
+          <h2 className="m-0 text-[14px] md:text-[15px] font-bold">Order Terbaru</h2>
+          <a onClick={onGoOrders} className="text-[#4f46e5] text-[12px] md:text-[12.5px] font-semibold cursor-pointer no-underline">Lihat semua →</a>
         </div>
-        <div className="jp-scroll overflow-x-auto">
+
+        {/* Desktop: tabel */}
+        <div className="hidden md:block jp-scroll overflow-x-auto">
           <table className="w-full border-collapse min-w-[720px]">
             <thead>
               <tr className="bg-[#fafbfd]">
@@ -75,6 +79,40 @@ export default function DashboardPage({ orders, onOpenOrder, onGoOrders }: Props
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile: card list */}
+        <div className="md:hidden">
+          {O.length === 0 && (
+            <div className="py-10 text-center">
+              <div className="text-[28px] mb-2">📦</div>
+              <div className="text-[13px] font-bold text-[#475569]">Belum ada order</div>
+              <div className="text-[12px] text-[#94a3b8] mt-1">Klik &quot;Buat Order&quot; untuk mulai</div>
+            </div>
+          )}
+          {O.slice(0, 5).map(o => {
+            const [pBg, pC] = payBadge(o.paymentStatus);
+            const [oBg, oC] = ordBadge(o.orderStatus);
+            return (
+              <div key={o.orderId} onClick={() => onOpenOrder(o.orderId)} className="flex items-center gap-3 px-4 py-3 border-t border-[#f1f5f9] cursor-pointer active:bg-[#f8fafc] transition-colors">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-bold text-[#4f46e5]">{o.invoiceNo}</span>
+                    <span className="text-[12px] font-semibold text-[#0f172a] truncate">{o.customerName}</span>
+                  </div>
+                  <div className="text-[11px] text-[#94a3b8] mt-[3px]">{o.batchName.replace('Jastip ', '')} · {o.items.length} produk</div>
+                  <div className="flex gap-1.5 mt-1.5">
+                    <span className="py-[2px] px-[7px] rounded-md text-[10px] font-bold" style={{ background: pBg, color: pC }}>{o.paymentStatus}</span>
+                    <span className="py-[2px] px-[7px] rounded-md text-[10px] font-bold" style={{ background: oBg, color: oC }}>{o.orderStatus}</span>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-[13px] font-bold">{rp(o.totalAmount)}</div>
+                  <div className="text-[10.5px] text-[#94a3b8] mt-[2px]">Sisa {rp(o.remainingAmount)}</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
