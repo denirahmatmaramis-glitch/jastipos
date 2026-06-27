@@ -47,7 +47,7 @@ const emptyState: AppState = {
   authed: false, route: 'dashboard', selectedOrderId: '', trackOrderId: '',
   detailTab: 'produk', orderFilter: 'Semua', customerSearch: '', toast: '',
   parsing: false, parsed: false, chatText: '', draft: { ...initialDraft },
-  payForm: { amount: '', method: 'Transfer BCA', type: 'Pelunasan' },
+  payForm: { amount: '', method: 'Transfer', type: 'Pelunasan' },
   globalFee: defaultFeeConfig(), customers: [], batches: [], orders: [],
   storeName: 'Toko Jastip Kamu', bankInfo: '',
   plan: 'free', upgradeStatus: 'none', upgradeCode: String(Math.floor(100 + Math.random() * 900)),
@@ -380,7 +380,7 @@ export default function JastipApp() {
                 notes: state.draft.custNotes,
                 courier: '', resi: '', shipCost: 0, shipDate: '', shipStatus: 'Belum dikirim', weight: 0,
                 items: state.draft.items.map(it => ({ ...it, purchaseStatus: it.purchaseStatus || 'Menunggu Pembelian' as const })),
-                payments: (state.draft.paid || 0) > 0 ? [{ date: new Date().toISOString().slice(0, 10), amount: state.draft.paid, method: 'Transfer BCA', type: 'DP' }] : [],
+                payments: (state.draft.paid || 0) > 0 ? [{ date: new Date().toISOString().slice(0, 10), amount: state.draft.paid, method: 'Transfer', type: 'DP' }] : [],
                 ...totals,
                 remainingAmount: totals.totalAmount - (state.draft.paid || 0),
               };
@@ -442,7 +442,7 @@ export default function JastipApp() {
                   const paymentStatus = remainingAmount <= 0 ? 'Lunas' : (o.paidAmount === 0 ? 'DP Diterima' : 'Menunggu Pelunasan');
                   return { ...o, paidAmount, remainingAmount, paymentStatus, payments: [...o.payments, payment] };
                 });
-                return { ...s, orders, payForm: { amount: '', method: 'Transfer BCA', type: 'Pelunasan' } };
+                return { ...s, orders, payForm: { amount: '', method: 'Transfer', type: 'Pelunasan' } };
               });
               persist(async () => {
                 const oid = state.selectedOrderId;
@@ -477,8 +477,25 @@ export default function JastipApp() {
               }));
             }}
             onSaveShip={() => {
+              setState(s => {
+                const orders = s.orders.map(o => {
+                  if (o.orderId !== s.selectedOrderId) return o;
+                  if (o.courier && o.resi && o.shipDate) {
+                    return { ...o, orderStatus: 'Dikirim ke Customer', shipStatus: 'Dikirim' };
+                  }
+                  return o;
+                });
+                return { ...s, orders };
+              });
               const o = state.orders.find(x => x.orderId === state.selectedOrderId);
-              if (o) persist(() => db.updateOrderFields(o.orderId, { courier: o.courier, resi: o.resi, shipDate: o.shipDate, shipStatus: o.shipStatus }));
+              if (o) {
+                const autoShipped = o.courier && o.resi && o.shipDate;
+                persist(() => db.updateOrderFields(o.orderId, {
+                  courier: o.courier, resi: o.resi, shipDate: o.shipDate,
+                  shipStatus: autoShipped ? 'Dikirim' : o.shipStatus,
+                  orderStatus: autoShipped ? 'Dikirim ke Customer' : o.orderStatus,
+                }));
+              }
               toast('Data pengiriman disimpan ✓');
             }}
             onOpenTrack={() => setState(s => ({ ...s, trackOrderId: s.selectedOrderId, route: 'track' as Route }))}
@@ -599,9 +616,10 @@ export default function JastipApp() {
             orderCount={state.orders.length}
             upgradeStatus={state.upgradeStatus}
             upgradeCode={state.upgradeCode}
-            onConfirmTransfer={() => {
+            bankInfo={state.bankInfo}
+            onConfirmTransfer={(senderName: string, amount: number) => {
               setState(s => ({ ...s, upgradeStatus: 'pending' }));
-              if (userId) persist(() => db.updateProfile(userId, { upgrade_status: 'pending' }));
+              if (userId) persist(() => db.updateProfile(userId, { upgrade_status: 'pending', upgrade_sender_name: senderName, upgrade_amount: amount, upgrade_code: state.upgradeCode } as Record<string, unknown>));
               toast('Konfirmasi transfer terkirim — menunggu verifikasi admin');
             }}
             onToast={toast}

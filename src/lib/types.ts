@@ -106,7 +106,7 @@ export interface Draft {
 
 export type Route = 'dashboard' | 'customers' | 'batches' | 'orders' | 'create' | 'detail' | 'payments' | 'reports' | 'fees' | 'templates' | 'track' | 'upgrade' | 'admin' | 'store-settings';
 
-export type DetailTab = 'produk' | 'ongkir' | 'bayar' | 'timeline' | 'invoice' | 'link' | 'resi';
+export type DetailTab = 'produk' | 'bayar' | 'timeline' | 'invoice' | 'link' | 'resi';
 
 export type Plan = 'free' | 'pro';
 export type UpgradeStatus = 'none' | 'pending' | 'active';

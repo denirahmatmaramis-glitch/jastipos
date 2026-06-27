@@ -27,7 +27,7 @@ interface Props {
   onToast: (m: string) => void;
 }
 
-const tabDef: [DetailTab, string][] = [['produk', 'Produk'], ['ongkir', 'Ongkir'], ['bayar', 'Pembayaran'], ['timeline', 'Timeline'], ['invoice', 'Invoice'], ['link', 'Customer Link'], ['resi', 'Shipment']];
+const tabDef: [DetailTab, string][] = [['produk', 'Produk'], ['bayar', 'Pembayaran'], ['timeline', 'Timeline'], ['invoice', 'Invoice'], ['link', 'Customer Link'], ['resi', 'Shipment']];
 const lblCls = "block text-xs font-semibold text-[#475569] mb-[5px]";
 const inpCls = "w-full py-2.5 px-3 border border-[#e2e8f0] rounded-[10px] text-[13.5px] outline-none bg-white";
 const lblSmCls = "block text-[11.5px] font-semibold text-[#64748b] mb-1";
@@ -218,42 +218,6 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
       )}
 
       {/* tab: ongkir */}
-      {tab === 'ongkir' && (
-        <div className="bg-white border border-[#eef0f6] rounded-2xl p-[22px] max-w-[560px]">
-          <h3 className="m-0 mb-1.5 text-[15px] font-bold">Ongkir &amp; Berat Paket</h3>
-          <p className="m-0 mb-4 text-[12.5px] text-[#64748b] leading-relaxed">Input berat dan total ongkir setelah semua produk sudah dibeli dan dipacking.</p>
-          {(() => {
-            const bought = o.items.filter(it => it.purchaseStatus === 'Sudah Dibeli').length;
-            const total = o.items.length;
-            const allBought = bought === total;
-            return (
-              <>
-                <div className="mb-4 p-3 rounded-[10px] text-[12.5px] font-semibold" style={{ background: allBought ? '#dcfce7' : '#fef3c7', color: allBought ? '#15803d' : '#b45309', border: `1px solid ${allBought ? '#bbf7d0' : '#fde68a'}` }}>
-                  {allBought
-                    ? `Semua ${total} produk sudah dibeli. Silakan input ongkir.`
-                    : `${bought}/${total} produk sudah dibeli. ${total - bought} produk masih menunggu pembelian.`}
-                </div>
-                <div className="grid grid-cols-2 gap-[13px]">
-                  <div>
-                    <label className={lblCls}>Berat Paket (gram)</label>
-                    <input type="number" value={ongkirWeight} onChange={e => setOngkirWeight(+e.target.value || 0)} placeholder="cth. 1500" className={inpCls} />
-                    {ongkirWeight > 0 && <div className="text-[11.5px] text-[#64748b] mt-1">{(ongkirWeight / 1000).toFixed(1)} kg</div>}
-                  </div>
-                  <div>
-                    <label className={lblCls}>Total Ongkir (Rp)</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13.5px] text-[#94a3b8] font-semibold">Rp</span>
-                      <input type="number" value={ongkirCost} onChange={e => setOngkirCost(+e.target.value || 0)} className={inpCls + ' pl-9'} />
-                    </div>
-                  </div>
-                </div>
-                <button onClick={() => { onSaveOngkir(ongkirWeight, ongkirCost); onToast('Ongkir disimpan ✓'); }} className="mt-4 py-3 px-[18px] border-none rounded-[11px] bg-[#4f46e5] text-white text-[13.5px] font-bold cursor-pointer hover:bg-[#4338ca] transition-colors">Simpan Ongkir</button>
-              </>
-            );
-          })()}
-        </div>
-      )}
-
       {/* tab: pembayaran */}
       {tab === 'bayar' && (
         <>
@@ -279,7 +243,7 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
               <div className="flex flex-col gap-[11px]">
                 <div><label className={lblSmCls}>Jumlah Bayar</label><input type="number" value={payForm.amount} onChange={e => onPayFormChange('amount', e.target.value)} className={inpSmCls} /></div>
                 <div className="flex gap-2.5">
-                  <div className="flex-1"><label className={lblSmCls}>Metode</label><select value={payForm.method} onChange={e => onPayFormChange('method', e.target.value)} className={inpSmCls}><option>Transfer BCA</option><option>Mandiri</option><option>QRIS</option><option>Cash</option></select></div>
+                  <div className="flex-1"><label className={lblSmCls}>Metode</label><select value={payForm.method} onChange={e => onPayFormChange('method', e.target.value)} className={inpSmCls}><option>Transfer</option><option>QRIS</option><option>Cash</option></select></div>
                   <div className="flex-1"><label className={lblSmCls}>Jenis</label><select value={payForm.type} onChange={e => onPayFormChange('type', e.target.value)} className={inpSmCls}><option>DP</option><option>Pelunasan</option><option>Tambahan Ongkir</option><option>Refund</option></select></div>
                 </div>
                 <button onClick={onAddPayment} className="py-[11px] border-none rounded-[10px] bg-[#16a34a] text-white text-[13px] font-bold cursor-pointer hover:bg-[#15803d] transition-colors">+ Catat Pembayaran</button>
@@ -387,15 +351,39 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
 
       {/* tab: shipment */}
       {tab === 'resi' && (
-        <div className="bg-white border border-[#eef0f6] rounded-2xl p-[22px] max-w-[560px]">
-          <h3 className="m-0 mb-4 text-[15px] font-bold">Pengiriman ke Customer</h3>
-          <div className="grid grid-cols-2 gap-[13px]">
-            <div><label className={lblCls}>Kurir</label><input value={o.courier} onChange={e => onShipFieldChange('courier', e.target.value)} placeholder="JNE / J&T / SiCepat" className={inpCls} /></div>
-            <div><label className={lblCls}>Nomor Resi</label><input value={o.resi} onChange={e => onShipFieldChange('resi', e.target.value)} placeholder="cth. JNE0099" className={inpCls} /></div>
-            <div><label className={lblCls}>Tanggal Kirim</label><input type="date" value={o.shipDate} onChange={e => onShipFieldChange('shipDate', e.target.value)} className={inpCls} /></div>
-            <div className="col-span-2"><label className={lblCls}>Status Pengiriman</label><select value={o.shipStatus} onChange={e => onShipFieldChange('shipStatus', e.target.value)} className={inpCls}><option>Belum dikirim</option><option>Sedang disiapkan</option><option>Dikirim</option><option>Diterima customer</option></select></div>
+        <div className="max-w-[560px] flex flex-col gap-4">
+          {/* Berat & Ongkir */}
+          <div className="bg-white border border-[#eef0f6] rounded-2xl p-[22px]">
+            <h3 className="m-0 mb-3 text-[15px] font-bold">Berat &amp; Ongkir</h3>
+            <div className="grid grid-cols-2 gap-[13px]">
+              <div>
+                <label className={lblCls}>Berat Paket (gram)</label>
+                <input type="number" value={ongkirWeight} onChange={e => setOngkirWeight(+e.target.value || 0)} placeholder="cth. 1500" className={inpCls} />
+                {ongkirWeight > 0 && <div className="text-[11.5px] text-[#64748b] mt-1">{(ongkirWeight / 1000).toFixed(1)} kg</div>}
+              </div>
+              <div>
+                <label className={lblCls}>Total Ongkir (Rp)</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13.5px] text-[#94a3b8] font-semibold">Rp</span>
+                  <input type="number" value={ongkirCost} onChange={e => setOngkirCost(+e.target.value || 0)} className={inpCls + ' pl-9'} />
+                </div>
+              </div>
+            </div>
+            <button onClick={() => { onSaveOngkir(ongkirWeight, ongkirCost); onToast('Ongkir disimpan ✓'); }} className="mt-3 py-2.5 px-[16px] border-none rounded-[10px] bg-[#4f46e5] text-white text-[13px] font-bold cursor-pointer hover:bg-[#4338ca] transition-colors">Simpan Ongkir</button>
           </div>
-          <button onClick={onSaveShip} className="mt-4 py-3 px-[18px] border-none rounded-[11px] bg-[#4f46e5] text-white text-[13.5px] font-bold cursor-pointer hover:bg-[#4338ca] transition-colors">Simpan Pengiriman</button>
+
+          {/* Pengiriman */}
+          <div className="bg-white border border-[#eef0f6] rounded-2xl p-[22px]">
+            <h3 className="m-0 mb-1 text-[15px] font-bold">Pengiriman ke Customer</h3>
+            <p className="m-0 mb-3 text-[12px] text-[#94a3b8]">Saat kurir, resi &amp; tanggal kirim diisi lalu disimpan, status order otomatis berubah ke &quot;Dikirim ke Customer&quot;.</p>
+            <div className="grid grid-cols-2 gap-[13px]">
+              <div><label className={lblCls}>Kurir</label><input value={o.courier} onChange={e => onShipFieldChange('courier', e.target.value)} placeholder="JNE / J&T / SiCepat" className={inpCls} /></div>
+              <div><label className={lblCls}>Nomor Resi</label><input value={o.resi} onChange={e => onShipFieldChange('resi', e.target.value)} placeholder="cth. JNE0099" className={inpCls} /></div>
+              <div><label className={lblCls}>Tanggal Kirim</label><input type="date" value={o.shipDate} onChange={e => onShipFieldChange('shipDate', e.target.value)} className={inpCls} /></div>
+              <div><label className={lblCls}>Status Pengiriman</label><select value={o.shipStatus} onChange={e => onShipFieldChange('shipStatus', e.target.value)} className={inpCls}><option>Belum dikirim</option><option>Dikirim</option><option>Diterima customer</option></select></div>
+            </div>
+            <button onClick={onSaveShip} className="mt-3 py-2.5 px-[16px] border-none rounded-[10px] bg-[#4f46e5] text-white text-[13px] font-bold cursor-pointer hover:bg-[#4338ca] transition-colors">Simpan Pengiriman</button>
+          </div>
         </div>
       )}
     </>

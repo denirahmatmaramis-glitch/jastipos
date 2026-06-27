@@ -52,13 +52,14 @@ export function ordBadge(s: string): [string, string] {
 
 export function buildSteps(status: string) {
   const map: Record<string, number> = {
-    'Menunggu DP': 0, 'DP Diterima': 1, 'Menunggu Pelunasan': 2,
-    'Menunggu Pembelian': 1, 'Sudah Dibeli': 3,
-    'Siap Dikirim': 4, 'Dikirim ke Customer': 5, 'Selesai': 6, 'Cancel/Refund': 99
+    'Menunggu DP': 0, 'DP Diterima': 1, 'Menunggu Pembelian': 2,
+    'Menunggu Pelunasan': 3, 'Sudah Dibeli': 4,
+    'Siap Dikirim': 5, 'Dikirim ke Customer': 6, 'Selesai': 7, 'Cancel/Refund': 99
   };
   const labels = [
-    'Order diterima', 'DP sudah diterima', 'Menunggu pelunasan',
-    'Barang sudah dibeli', 'Siap dikirim', 'Dikirim ke customer', 'Selesai'
+    'Order diterima', 'DP sudah diterima', 'Menunggu pembelian',
+    'Menunggu pelunasan', 'Barang sudah dibeli', 'Siap dikirim',
+    'Dikirim ke customer', 'Selesai'
   ];
   const cur = map[status] ?? 0;
   return labels.map((l, i) => {

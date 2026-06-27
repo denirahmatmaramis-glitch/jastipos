@@ -233,8 +233,8 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
           <div className="h-px bg-[#eef0f7] my-3.5" />
           <label className={lblCls}>Metode Pembayaran</label>
           <div className="flex gap-2 mb-3">
-            <button onClick={() => { onDraftField('dpPercent', 50); onDraftField('paymentStatus', 'Menunggu DP'); }} className="flex-1 py-2.5 rounded-[10px] text-[12px] font-bold cursor-pointer transition-colors" style={{ border: `1.5px solid ${d.dpPercent < 100 ? '#4f46e5' : '#e2e8f0'}`, background: d.dpPercent < 100 ? '#f5f3ff' : '#fff', color: d.dpPercent < 100 ? '#4f46e5' : '#475569' }}>Pakai DP</button>
-            <button onClick={() => { onDraftField('dpPercent', 100); onDraftField('paymentStatus', 'Menunggu Pelunasan'); }} className="flex-1 py-2.5 rounded-[10px] text-[12px] font-bold cursor-pointer transition-colors" style={{ border: `1.5px solid ${d.dpPercent >= 100 ? '#4f46e5' : '#e2e8f0'}`, background: d.dpPercent >= 100 ? '#f5f3ff' : '#fff', color: d.dpPercent >= 100 ? '#4f46e5' : '#475569' }}>Bayar Lunas</button>
+            <button onClick={() => { onDraftField('dpPercent', 50); onDraftField('paymentStatus', 'Menunggu DP'); onDraftField('orderStatus', 'Menunggu DP'); }} className="flex-1 py-2.5 rounded-[10px] text-[12px] font-bold cursor-pointer transition-colors" style={{ border: `1.5px solid ${d.dpPercent < 100 ? '#4f46e5' : '#e2e8f0'}`, background: d.dpPercent < 100 ? '#f5f3ff' : '#fff', color: d.dpPercent < 100 ? '#4f46e5' : '#475569' }}>Pakai DP</button>
+            <button onClick={() => { onDraftField('dpPercent', 100); onDraftField('paymentStatus', 'Menunggu Pelunasan'); onDraftField('orderStatus', 'Menunggu Pelunasan'); }} className="flex-1 py-2.5 rounded-[10px] text-[12px] font-bold cursor-pointer transition-colors" style={{ border: `1.5px solid ${d.dpPercent >= 100 ? '#4f46e5' : '#e2e8f0'}`, background: d.dpPercent >= 100 ? '#f5f3ff' : '#fff', color: d.dpPercent >= 100 ? '#4f46e5' : '#475569' }}>Bayar Lunas</button>
           </div>
           {d.dpPercent < 100 && (
             <div>

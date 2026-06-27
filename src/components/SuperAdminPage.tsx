@@ -11,6 +11,9 @@ interface AdminUser {
   upgradeStatus: string;
   orderCount: number;
   customerCount: number;
+  upgradeSenderName: string;
+  upgradeAmount: number;
+  upgradeCode: string;
   createdAt: string;
 }
 
@@ -114,14 +117,21 @@ export default function SuperAdminPage({ onToast }: Props) {
         <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[14px] p-4 mb-4">
           <div className="text-[13px] font-bold text-[#92400e] mb-2.5">Menunggu Verifikasi Upgrade</div>
           {users.filter(u => u.upgradeStatus === 'pending').map(u => (
-            <div key={u.id} className="flex items-center justify-between gap-3 bg-white border border-[#fde68a] rounded-[11px] p-3 mb-2 last:mb-0">
-              <div>
-                <div className="text-[13px] font-bold">{u.email}</div>
-                <div className="text-[11px] text-[#94a3b8]">{u.storeName} · {u.orderCount} order · Daftar {dt(u.createdAt)}</div>
+            <div key={u.id} className="bg-white border border-[#fde68a] rounded-[11px] p-3 mb-2 last:mb-0">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[13px] font-bold">{u.email}</div>
+                  <div className="text-[11px] text-[#94a3b8]">{u.storeName} · {u.orderCount} order</div>
+                </div>
+                <button onClick={() => doAction(u.id, 'activate')} disabled={acting === u.id} className="py-2 px-3.5 border-none rounded-[10px] bg-[#16a34a] text-white text-[12px] font-bold cursor-pointer hover:bg-[#15803d] transition-colors disabled:opacity-50 whitespace-nowrap">
+                  {acting === u.id ? '...' : 'Aktivasi Pro'}
+                </button>
               </div>
-              <button onClick={() => doAction(u.id, 'activate')} disabled={acting === u.id} className="py-2 px-3.5 border-none rounded-[10px] bg-[#16a34a] text-white text-[12px] font-bold cursor-pointer hover:bg-[#15803d] transition-colors disabled:opacity-50 whitespace-nowrap">
-                {acting === u.id ? '...' : 'Aktivasi Pro'}
-              </button>
+              <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 mt-2 pt-2 border-t border-[#fef3c7] text-[12px]">
+                <span className="text-[#94a3b8]">Pengirim</span><span className="font-semibold">{u.upgradeSenderName || '-'}</span>
+                <span className="text-[#94a3b8]">Total transfer</span><span className="font-semibold text-[#4f46e5]">{u.upgradeAmount ? `Rp${u.upgradeAmount.toLocaleString('id-ID')}` : '-'}</span>
+                <span className="text-[#94a3b8]">Kode unik</span><span className="font-semibold">{u.upgradeCode || '-'}</span>
+              </div>
             </div>
           ))}
         </div>

@@ -38,6 +38,9 @@ export interface Profile {
   bank_info: string;
   plan: string;
   upgrade_status: string;
+  upgrade_sender_name: string;
+  upgrade_amount: number;
+  upgrade_code: string;
   fee_config: FeeConfig;
 }
 
@@ -47,7 +50,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
   return data as Profile;
 }
 
-export async function updateProfile(userId: string, updates: Partial<{ store_name: string; bank_info: string; plan: string; upgrade_status: string; fee_config: FeeConfig }>) {
+export async function updateProfile(userId: string, updates: Record<string, unknown>) {
   const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
   if (error) throw error;
 }
