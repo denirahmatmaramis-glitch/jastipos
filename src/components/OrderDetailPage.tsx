@@ -251,6 +251,28 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
               </div>
             </div>
           </div>
+          {/* Reminder buttons */}
+          {(o.paymentStatus === 'Menunggu DP' || o.paymentStatus === 'DP Diterima' || o.paymentStatus === 'Menunggu Pelunasan') && (
+            <div className="mt-4 bg-white border border-[#eef0f6] rounded-2xl p-4 md:p-5">
+              <h3 className="m-0 mb-2.5 text-[14px] font-bold">Kirim Reminder via WhatsApp</h3>
+              {(o.paymentStatus === 'Menunggu DP') && (() => {
+                const dpAmount = Math.round(o.totalAmount * o.dpPercent / 100);
+                const productList = o.items.map((it, i) => `${i + 1}. ${it.productName}${it.color !== '-' ? ' ' + it.color : ''}${it.size !== '-' ? ' ' + it.size : ''} x${it.qty} — ${rp(it.priceInIdr)}`).join('\n');
+                const msg = `Halo Kak ${o.customerName}, ini reminder untuk DP order jastip kamu ya:\n\nInvoice: ${o.invoiceNo}\n\nProduk:\n${productList}\n\nTotal Order: ${rp(o.totalAmount)}\nDP Minimal (${o.dpPercent}%): ${rp(dpAmount)}\n\nMohon transfer DP agar slot order kamu aman. Terima kasih 🙏`;
+                return (
+                  <button onClick={() => window.open(waLink(o.customerPhone, msg), '_blank')} className="w-full py-2.5 border-none rounded-[10px] bg-[#f59e0b] text-white text-[13px] font-bold cursor-pointer hover:bg-[#d97706] transition-colors">Reminder DP via WhatsApp</button>
+                );
+              })()}
+              {(o.paymentStatus === 'Menunggu Pelunasan' || o.paymentStatus === 'DP Diterima') && (() => {
+                const productList = o.items.map((it, i) => `${i + 1}. ${it.productName}${it.color !== '-' ? ' ' + it.color : ''}${it.size !== '-' ? ' ' + it.size : ''} x${it.qty} — ${rp(it.priceInIdr)}`).join('\n');
+                const msg = `Halo Kak ${o.customerName}, ini reminder pelunasan order jastip kamu ya:\n\nInvoice: ${o.invoiceNo}\n\nProduk:\n${productList}\n\nTotal Order: ${rp(o.totalAmount)}\nSudah Dibayar: ${rp(o.paidAmount)}\nSisa Pelunasan: ${rp(o.remainingAmount)}\n\nMohon pelunasan agar barang bisa segera dikirim. Terima kasih 🙏`;
+                return (
+                  <button onClick={() => window.open(waLink(o.customerPhone, msg), '_blank')} className="w-full py-2.5 border-none rounded-[10px] bg-[#f97316] text-white text-[13px] font-bold cursor-pointer hover:bg-[#ea580c] transition-colors">Reminder Pelunasan via WhatsApp</button>
+                );
+              })()}
+            </div>
+          )}
+
           <div className="bg-white border border-[#eef0f6] rounded-2xl mt-4 overflow-hidden">
             <div className="py-4 px-5 border-b border-[#f1f5f9] text-sm font-bold">Riwayat Pembayaran</div>
             {o.payments.map((p, i) => {

@@ -66,7 +66,15 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
     const nextFrom = lastTier && lastTier.upTo > 0 ? lastTier.upTo + 1 : 0;
     return { ...w, tiers: [...w.tiers, { from: nextFrom, upTo: 0, fee: 0, isPercent: false }] };
   });
-  const removeTier = (i: number) => setWorking(w => ({ ...w, tiers: w.tiers.filter((_, idx) => idx !== i) }));
+  const removeTier = (i: number) => setWorking(w => {
+    const tiers = w.tiers.filter((_, idx) => idx !== i);
+    for (let j = 1; j < tiers.length; j++) {
+      if (tiers[j - 1].upTo > 0) {
+        tiers[j] = { ...tiers[j], from: tiers[j - 1].upTo + 1 };
+      }
+    }
+    return { ...w, tiers };
+  });
 
   const save = () => {
     if (scope === 'global') {
@@ -183,28 +191,30 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
               <div className="flex flex-col gap-2.5">
                 {/* Desktop table */}
                 <div className="hidden md:block">
-                  <div className="grid grid-cols-[1fr_1fr_120px_88px_28px] gap-2 px-1 text-[10.5px] font-bold text-[#94a3b8] uppercase tracking-wide">
-                    <span>Harga dari</span><span>Harga sampai</span><span>Fee</span><span>Satuan</span><span></span>
+                  <div className="grid grid-cols-[1fr_1fr_120px_28px] gap-2 px-1 text-[10.5px] font-bold text-[#94a3b8] uppercase tracking-wide">
+                    <span>Harga dari</span><span>Harga sampai</span><span>Fee (Rp)</span><span></span>
                   </div>
                   {working.tiers.map((t, i) => (
-                    <div key={i} className="grid grid-cols-[1fr_1fr_120px_88px_28px] gap-2 items-center bg-[#fafbfd] border border-[#eef0f6] rounded-[11px] p-[8px_10px] mt-2">
+                    <div key={i} className="grid grid-cols-[1fr_1fr_120px_28px] gap-2 items-center bg-[#fafbfd] border border-[#eef0f6] rounded-[11px] p-[8px_10px] mt-2">
                       <div className="relative">
                         <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#94a3b8] font-semibold">Rp</span>
                         <NumInput value={t.from} onChange={v => updateTier(i, { from: v })} className="w-full py-2 pl-8 pr-2 border border-[#e2e8f0] rounded-[8px] text-[13px] font-semibold outline-none bg-white" />
                       </div>
                       {t.upTo === 0 ? (
-                        <div className="py-2 px-2.5 text-[13px] font-semibold text-[#64748b]">∞ ke atas</div>
+                        <div className="relative">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#94a3b8] font-semibold">Rp</span>
+                          <NumInput value={0} onChange={v => updateTier(i, { upTo: v })} className="w-full py-2 pl-8 pr-2 border border-[#e2e8f0] rounded-[8px] text-[13px] font-semibold outline-none bg-white" placeholder="0 = tak terbatas" />
+                        </div>
                       ) : (
                         <div className="relative">
                           <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#94a3b8] font-semibold">Rp</span>
                           <NumInput value={t.upTo} onChange={v => updateTier(i, { upTo: v })} className="w-full py-2 pl-8 pr-2 border border-[#e2e8f0] rounded-[8px] text-[13px] font-semibold outline-none bg-white" />
                         </div>
                       )}
-                      <NumInput value={t.fee} onChange={v => updateTier(i, { fee: v })} className="w-full py-2 px-2.5 border border-[#e2e8f0] rounded-[8px] text-[13px] font-bold text-[#4f46e5] outline-none bg-white" />
-                      <select value={t.isPercent ? 'pct' : 'rp'} onChange={e => updateTier(i, { isPercent: e.target.value === 'pct' })} className="w-full py-2 px-1.5 border border-[#e2e8f0] rounded-[8px] text-[12.5px] outline-none bg-white">
-                        <option value="rp">Rp</option>
-                        <option value="pct">%</option>
-                      </select>
+                      <div className="relative">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#94a3b8] font-semibold">Rp</span>
+                        <NumInput value={t.fee} onChange={v => updateTier(i, { fee: v })} className="w-full py-2 pl-8 pr-2 border border-[#e2e8f0] rounded-[8px] text-[13px] font-bold text-[#4f46e5] outline-none bg-white" />
+                      </div>
                       <button onClick={() => removeTier(i)} title="Hapus tier" className="bg-transparent border-none text-[#ef4444] cursor-pointer p-1" disabled={working.tiers.length <= 1} style={{ opacity: working.tiers.length <= 1 ? 0.3 : 1 }}>
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
                       </button>
@@ -230,25 +240,17 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
                         </div>
                         <div>
                           <label className="block text-[10.5px] font-semibold text-[#94a3b8] mb-1">Harga sampai</label>
-                          {t.upTo === 0 ? (
-                            <div className="py-2 px-2.5 text-[12.5px] font-semibold text-[#64748b] border border-[#e2e8f0] rounded-[9px] bg-white">∞ ke atas</div>
-                          ) : (
-                            <div className="relative">
-                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-[#94a3b8] font-semibold">Rp</span>
-                              <NumInput value={t.upTo} onChange={v => updateTier(i, { upTo: v })} className={inputSmCls + ' pl-7 text-[12.5px]'} />
-                            </div>
-                          )}
+                          <div className="relative">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-[#94a3b8] font-semibold">Rp</span>
+                            <NumInput value={t.upTo} onChange={v => updateTier(i, { upTo: v })} className={inputSmCls + ' pl-7 text-[12.5px]'} placeholder="0 = tak terbatas" />
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-[10.5px] font-semibold text-[#94a3b8] mb-1">Fee</label>
-                          <NumInput value={t.fee} onChange={v => updateTier(i, { fee: v })} className={inputSmCls + ' text-[12.5px] font-bold text-[#4f46e5]'} />
-                        </div>
-                        <div>
-                          <label className="block text-[10.5px] font-semibold text-[#94a3b8] mb-1">Satuan</label>
-                          <select value={t.isPercent ? 'pct' : 'rp'} onChange={e => updateTier(i, { isPercent: e.target.value === 'pct' })} className={inputSmCls + ' text-[12.5px]'}>
-                            <option value="rp">Rupiah (Rp)</option>
-                            <option value="pct">Persen (%)</option>
-                          </select>
+                        <div className="col-span-2">
+                          <label className="block text-[10.5px] font-semibold text-[#94a3b8] mb-1">Fee (Rp)</label>
+                          <div className="relative">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-[#94a3b8] font-semibold">Rp</span>
+                            <NumInput value={t.fee} onChange={v => updateTier(i, { fee: v })} className={inputSmCls + ' pl-7 text-[12.5px] font-bold text-[#4f46e5]'} />
+                          </div>
                         </div>
                       </div>
                     </div>
