@@ -50,31 +50,82 @@ export function ordBadge(s: string): [string, string] {
   return ['#fff7ed', '#c2410c'];
 }
 
-export function buildSteps(status: string) {
-  const map: Record<string, number> = {
-    'Menunggu DP': 0, 'DP Diterima': 1, 'Menunggu Pembelian': 2,
-    'Menunggu Pelunasan': 3, 'Sudah Dibeli': 4,
+export function buildSteps(status: string, dpPercent: number) {
+  const isDP = dpPercent < 100;
+
+  const dpLabels = [
+    'Order diterima', 'Menunggu DP', 'DP diterima', 'Menunggu pelunasan', 'Lunas',
+    'Menunggu pembelian', 'Barang sudah dibeli', 'Siap dikirim', 'Dikirim ke customer', 'Selesai'
+  ];
+  const dpMap: Record<string, number> = {
+    'Menunggu DP': 1, 'DP Diterima': 2, 'Menunggu Pelunasan': 3, 'Lunas': 4,
+    'Menunggu Pembelian': 5, 'Sudah Dibeli': 6,
+    'Siap Dikirim': 7, 'Dikirim ke Customer': 8, 'Selesai': 9, 'Cancel/Refund': 99
+  };
+
+  const lunasLabels = [
+    'Order diterima', 'Menunggu pelunasan', 'Lunas',
+    'Menunggu pembelian', 'Barang sudah dibeli', 'Siap dikirim', 'Dikirim ke customer', 'Selesai'
+  ];
+  const lunasMap: Record<string, number> = {
+    'Menunggu Pelunasan': 1, 'Lunas': 2,
+    'Menunggu Pembelian': 3, 'Sudah Dibeli': 4,
     'Siap Dikirim': 5, 'Dikirim ke Customer': 6, 'Selesai': 7, 'Cancel/Refund': 99
   };
-  const labels = [
-    'Order diterima', 'DP sudah diterima', 'Menunggu pembelian',
-    'Menunggu pelunasan', 'Barang sudah dibeli', 'Siap dikirim',
-    'Dikirim ke customer', 'Selesai'
-  ];
+
+  const labels = isDP ? dpLabels : lunasLabels;
+  const map = isDP ? dpMap : lunasMap;
   const cur = map[status] ?? 0;
+  const isCancelled = status === 'Cancel/Refund';
+
   return labels.map((l, i) => {
-    const done = i < cur, now = i === cur;
+    const done = isCancelled ? false : i < cur;
+    const now = isCancelled ? false : i === cur;
     return {
-      label: l,
-      sub: done ? 'Selesai' : (now ? 'Sedang berjalan' : 'Menunggu'),
-      icon: done ? '✓' : (now ? '●' : '○'),
-      dotBg: done ? '#16a34a' : (now ? '#eef2ff' : '#fff'),
-      dotColor: done ? '#fff' : (now ? '#4f46e5' : '#cbd5e1'),
-      dotBorder: done ? '#16a34a' : (now ? '#4f46e5' : '#e2e8f0'),
-      lineColor: i < cur ? '#16a34a' : '#e2e8f0',
-      textColor: (done || now) ? '#0f172a' : '#94a3b8',
+      label: isCancelled && i === 0 ? 'Cancel / Refund' : l,
+      sub: isCancelled ? (i === 0 ? 'Dibatalkan' : '-') : (done ? 'Selesai' : (now ? 'Sedang berjalan' : 'Menunggu')),
+      icon: isCancelled ? (i === 0 ? '✕' : '○') : (done ? '✓' : (now ? '●' : '○')),
+      dotBg: isCancelled ? (i === 0 ? '#ef4444' : '#fff') : (done ? '#16a34a' : (now ? '#eef2ff' : '#fff')),
+      dotColor: isCancelled ? (i === 0 ? '#fff' : '#cbd5e1') : (done ? '#fff' : (now ? '#4f46e5' : '#cbd5e1')),
+      dotBorder: isCancelled ? (i === 0 ? '#ef4444' : '#e2e8f0') : (done ? '#16a34a' : (now ? '#4f46e5' : '#e2e8f0')),
+      lineColor: isCancelled ? '#e2e8f0' : (i < cur ? '#16a34a' : '#e2e8f0'),
+      textColor: isCancelled ? (i === 0 ? '#b91c1c' : '#94a3b8') : ((done || now) ? '#0f172a' : '#94a3b8'),
     };
   });
+}
+
+export function autoOrderStatus(order: Order): { orderStatus: string; paymentStatus: string } {
+  let { orderStatus, paymentStatus } = order;
+  const allBought = order.items.length > 0 && order.items.every(it => it.purchaseStatus === 'Sudah Dibeli');
+
+  if (orderStatus === 'Cancel/Refund' || orderStatus === 'Selesai' || orderStatus === 'Dikirim ke Customer') {
+    return { orderStatus, paymentStatus };
+  }
+
+  if (order.remainingAmount <= 0 && order.paidAmount > 0) {
+    paymentStatus = 'Lunas';
+    if (allBought) {
+      orderStatus = 'Sudah Dibeli';
+    } else {
+      orderStatus = 'Menunggu Pembelian';
+    }
+  } else if (order.paidAmount > 0 && order.remainingAmount > 0) {
+    if (order.dpPercent >= 100) {
+      paymentStatus = 'Menunggu Pelunasan';
+      orderStatus = 'Menunggu Pelunasan';
+    } else {
+      paymentStatus = order.paidAmount >= Math.round(order.totalAmount * order.dpPercent / 100) ? 'Menunggu Pelunasan' : 'DP Diterima';
+      orderStatus = paymentStatus === 'Menunggu Pelunasan' ? 'Menunggu Pelunasan' : 'DP Diterima';
+    }
+  }
+
+  if (paymentStatus === 'Lunas' && allBought) {
+    orderStatus = 'Sudah Dibeli';
+  } else if (paymentStatus === 'Lunas' && !allBought) {
+    orderStatus = 'Menunggu Pembelian';
+  }
+
+  return { orderStatus, paymentStatus };
 }
 
 export function buildInvoiceText(o: Order, storeName: string, bankInfo: string): string {
@@ -85,7 +136,7 @@ export function buildInvoiceText(o: Order, storeName: string, bankInfo: string):
 }
 
 export const PAY_STATUSES = ['Menunggu DP', 'DP Diterima', 'Menunggu Pelunasan', 'Lunas', 'Refund'];
-export const ORDER_STATUSES = ['Menunggu DP', 'DP Diterima', 'Menunggu Pelunasan', 'Menunggu Pembelian', 'Sudah Dibeli', 'Siap Dikirim', 'Dikirim ke Customer', 'Selesai', 'Cancel/Refund'];
+export const ORDER_STATUSES = ['Menunggu DP', 'DP Diterima', 'Menunggu Pelunasan', 'Lunas', 'Menunggu Pembelian', 'Sudah Dibeli', 'Siap Dikirim', 'Dikirim ke Customer', 'Selesai', 'Cancel/Refund'];
 
 export function emptyItem(): OrderItem {
   return { productName: '', brandStore: '', productLink: '', color: '', size: '', qty: 1, priceInIdr: 0, jastipFee: 0, localShipping: 0, intlShipping: 0, otherFee: 0, purchaseStatus: 'Menunggu Pembelian' };

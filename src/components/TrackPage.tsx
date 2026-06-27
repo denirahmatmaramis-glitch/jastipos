@@ -14,7 +14,7 @@ interface Props {
 
 export default function TrackPage({ order: o, batches, authed, storeName, onBack }: Props) {
   const batch = batches.find(b => b.id === o.batchId);
-  const steps = buildSteps(o.orderStatus);
+  const steps = buildSteps(o.orderStatus, o.dpPercent);
 
   return (
     <div className="min-h-screen bg-[#eef0f7] pb-10 animate-fadein">

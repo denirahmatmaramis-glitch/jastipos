@@ -44,7 +44,7 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
   const canAddItem = !['Dikirim ke Customer', 'Selesai', 'Cancel/Refund'].includes(o.orderStatus);
   const [pBg, pC] = payBadge(o.paymentStatus);
   const [oBg, oC] = ordBadge(o.orderStatus);
-  const steps = buildSteps(o.orderStatus);
+  const steps = buildSteps(o.orderStatus, o.dpPercent);
   const invoiceText = buildInvoiceText(o, storeName, bankInfo);
   const trackUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/track/${o.trackingToken}`;
 

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Route, DetailTab, Order, OrderItem, FeeConfig } from '@/lib/types';
-import { calcOrderTotals, emptyItem, applyFeesToDraft, effectiveFeeConfig, feeConfigSummary, calcFeeForItem, defaultFeeConfig } from '@/lib/utils';
+import { calcOrderTotals, emptyItem, applyFeesToDraft, effectiveFeeConfig, feeConfigSummary, calcFeeForItem, defaultFeeConfig, autoOrderStatus } from '@/lib/utils';
 import { AppState, FREE_ORDER_LIMIT, initialDraft, initialState as demoState } from '@/lib/store';
 import { supabaseConfigured } from '@/lib/supabase';
 import * as db from '@/lib/db';
@@ -439,8 +439,9 @@ export default function JastipApp() {
                   if (o.orderId !== s.selectedOrderId) return o;
                   const paidAmount = o.paidAmount + amt;
                   const remainingAmount = o.totalAmount - paidAmount;
-                  const paymentStatus = remainingAmount <= 0 ? 'Lunas' : (o.paidAmount === 0 ? 'DP Diterima' : 'Menunggu Pelunasan');
-                  return { ...o, paidAmount, remainingAmount, paymentStatus, payments: [...o.payments, payment] };
+                  const updated = { ...o, paidAmount, remainingAmount, payments: [...o.payments, payment] };
+                  const { orderStatus, paymentStatus } = autoOrderStatus(updated);
+                  return { ...updated, orderStatus, paymentStatus };
                 });
                 return { ...s, orders, payForm: { amount: '', method: 'Transfer', type: 'Pelunasan' } };
               });
@@ -451,8 +452,9 @@ export default function JastipApp() {
                 if (order) {
                   const paidAmount = order.paidAmount + amt;
                   const remainingAmount = order.totalAmount - paidAmount;
-                  const paymentStatus = remainingAmount <= 0 ? 'Lunas' : (order.paidAmount === 0 ? 'DP Diterima' : 'Menunggu Pelunasan');
-                  await db.updateOrderFields(oid, { paidAmount, remainingAmount, paymentStatus });
+                  const updated = { ...order, paidAmount, remainingAmount };
+                  const { orderStatus, paymentStatus } = autoOrderStatus(updated);
+                  await db.updateOrderFields(oid, { paidAmount, remainingAmount, paymentStatus, orderStatus });
                 }
               });
               toast('Pembayaran dicatat ✓');
@@ -553,8 +555,10 @@ export default function JastipApp() {
                   const items = o.items.map((it, i) => i === idx ? item : it);
                   const totals = calcOrderTotals(items);
                   const updated = { ...o, items, ...totals, remainingAmount: totals.totalAmount - o.paidAmount };
-                  updatedOrder = updated;
-                  return updated;
+                  const { orderStatus, paymentStatus } = autoOrderStatus(updated);
+                  const final = { ...updated, orderStatus, paymentStatus };
+                  updatedOrder = final;
+                  return final;
                 });
                 return { ...s, orders };
               });
@@ -562,7 +566,7 @@ export default function JastipApp() {
                 const uo = updatedOrder;
                 persist(async () => {
                   await db.replaceOrderItems(uo.orderId, uo.items);
-                  await db.updateOrderFields(uo.orderId, { totalProduct: uo.totalProduct, totalFee: uo.totalFee, totalLocal: uo.totalLocal, totalIntl: uo.totalIntl, totalOther: uo.totalOther, totalAmount: uo.totalAmount, remainingAmount: uo.remainingAmount });
+                  await db.updateOrderFields(uo.orderId, { totalProduct: uo.totalProduct, totalFee: uo.totalFee, totalLocal: uo.totalLocal, totalIntl: uo.totalIntl, totalOther: uo.totalOther, totalAmount: uo.totalAmount, remainingAmount: uo.remainingAmount, orderStatus: uo.orderStatus, paymentStatus: uo.paymentStatus });
                 });
               }
             }}
