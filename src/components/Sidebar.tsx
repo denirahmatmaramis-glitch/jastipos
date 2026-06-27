@@ -3,7 +3,7 @@
 import { Route, Plan } from '@/lib/types';
 import { FREE_ORDER_LIMIT } from '@/lib/store';
 import { LogoIcon, LogoutIcon, DashboardIcon, CustomersIcon, BatchesIcon, OrdersIcon, CreateIcon, PaymentsIcon, ReportsIcon, FeesIcon, TemplatesIcon, StoreIcon } from '@/lib/icons';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 const navDef: [Route | 'create', string, () => ReactNode][] = [
   ['dashboard', 'Dashboard', DashboardIcon],
@@ -103,24 +103,59 @@ export default function Sidebar({ route, onNav, onLogout, plan, orderCount }: Si
   );
 }
 
+function MoreIcon() {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg>;
+}
+
+const moreMenuItems: [Route, string, () => ReactNode][] = [
+  ['customers', 'Customer', CustomersIcon],
+  ['batches', 'Batch Jastip', BatchesIcon],
+  ['fees', 'Setting Fee', FeesIcon],
+  ['templates', 'Template WA', TemplatesIcon],
+  ['store-settings', 'Pengaturan Toko', StoreIcon],
+  ['payments', 'Pembayaran', PaymentsIcon],
+  ['reports', 'Laporan', ReportsIcon],
+];
+
 export function BottomNav({ route, onNav }: { route: Route; onNav: (r: Route) => void }) {
   const activePage = route === 'detail' ? 'orders' : route;
-  const items: [Route, string, () => ReactNode][] = [
+  const [showMore, setShowMore] = useState(false);
+  const mainItems: [Route, string, () => ReactNode][] = [
     ['dashboard', 'Home', DashboardIcon],
     ['orders', 'Order', OrdersIcon],
     ['create', 'Buat', CreateIcon],
-    ['payments', 'Bayar', PaymentsIcon],
-    ['reports', 'Laporan', ReportsIcon],
   ];
+  const isMoreActive = moreMenuItems.some(([k]) => k === activePage);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 flex md:hidden justify-around py-2 px-1.5 z-30 shadow-[0_-4px_20px_rgba(0,0,0,.2)]" style={{ background: '#1e1b4b' }}>
-      {items.map(([key, label, Icon]) => (
-        <button key={key} onClick={() => onNav(key)} className="bg-transparent border-none flex flex-col items-center gap-[3px] cursor-pointer px-2 py-1 transition-colors" style={{ color: key === activePage ? '#fff' : 'rgba(199,202,240,.6)' }}>
-          <Icon />
-          <span className="text-[10px] font-semibold">{label}</span>
+    <>
+      {showMore && (
+        <div className="fixed inset-0 z-40 md:hidden" onClick={() => setShowMore(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute bottom-[60px] left-2 right-2 rounded-[16px] p-3 animate-slideup" style={{ background: '#1e1b4b' }} onClick={e => e.stopPropagation()}>
+            <div className="grid grid-cols-4 gap-2">
+              {moreMenuItems.map(([key, label, Icon]) => (
+                <button key={key} onClick={() => { onNav(key); setShowMore(false); }} className="bg-transparent border-none flex flex-col items-center gap-[5px] cursor-pointer py-2.5 px-1 rounded-[10px] transition-colors" style={{ color: key === activePage ? '#fff' : 'rgba(199,202,240,.7)', background: key === activePage ? 'rgba(129,140,248,.22)' : 'transparent' }}>
+                  <Icon />
+                  <span className="text-[10px] font-semibold leading-tight text-center">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="fixed bottom-0 left-0 right-0 flex md:hidden justify-around py-2 px-1.5 z-30 shadow-[0_-4px_20px_rgba(0,0,0,.2)]" style={{ background: '#1e1b4b' }}>
+        {mainItems.map(([key, label, Icon]) => (
+          <button key={key} onClick={() => { onNav(key); setShowMore(false); }} className="bg-transparent border-none flex flex-col items-center gap-[3px] cursor-pointer px-3 py-1 transition-colors" style={{ color: key === activePage ? '#fff' : 'rgba(199,202,240,.6)' }}>
+            <Icon />
+            <span className="text-[10px] font-semibold">{label}</span>
+          </button>
+        ))}
+        <button onClick={() => setShowMore(v => !v)} className="bg-transparent border-none flex flex-col items-center gap-[3px] cursor-pointer px-3 py-1 transition-colors" style={{ color: isMoreActive || showMore ? '#fff' : 'rgba(199,202,240,.6)' }}>
+          <MoreIcon />
+          <span className="text-[10px] font-semibold">Lainnya</span>
         </button>
-      ))}
-    </div>
+      </div>
+    </>
   );
 }
