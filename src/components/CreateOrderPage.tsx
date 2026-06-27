@@ -60,23 +60,31 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-[18px] items-start">
       <div className="flex flex-col gap-4">
         {/* paste chat */}
-        <div className="bg-white border border-[#eef0f6] rounded-2xl p-5">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-[26px] h-[26px] rounded-lg bg-[#eef2ff] text-[#4f46e5] flex items-center justify-center text-[13px] font-extrabold">1</div>
-            <h3 className="m-0 text-[15px] font-bold">Tempel Chat Customer</h3>
+        <div className="bg-white border border-[#eef0f6] rounded-2xl p-4 md:p-5">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg, #818cf8, #6366f1)' }}>
+              <SparkleIcon />
+            </div>
+            <div>
+              <h3 className="m-0 text-[15px] font-bold">AI Auto-Fill dari Chat</h3>
+              <p className="m-0 text-[11.5px] text-[#94a3b8]">Powered by AI — otomatis baca &amp; isi form</p>
+            </div>
           </div>
-          <p className="m-0 mb-3 ml-[34px] text-[#64748b] text-[12.5px]">Salin chat WhatsApp customer, lalu tempel di bawah. AI akan membantu mengisi form.</p>
-          <textarea value={chatText} onChange={e => onChatInput(e.target.value)} placeholder="Tempel chat customer dari WhatsApp di sini..." className="w-full min-h-[110px] p-[13px] border border-[#e2e8f0] rounded-xl text-[13.5px] leading-relaxed outline-none resize-y bg-[#fafbfd]" />
-          <button onClick={onParseChat} className="mt-3 inline-flex items-center gap-2 py-[11px] px-[18px] border-none rounded-[11px] bg-[#4f46e5] text-white text-[13.5px] font-bold cursor-pointer hover:bg-[#4338ca] transition-colors">
+          <div className="bg-[#eef2ff] border border-[#c7d2fe] rounded-[11px] p-3 mb-3 text-[12px] text-[#3730a3] leading-relaxed">
+            Cukup <b>copy-paste chat WhatsApp</b> dari customer ke kolom di bawah. AI akan otomatis mengenali <b>nama, nomor HP, alamat, produk, warna, ukuran, jumlah, dan harga</b> — lalu mengisi semua field secara otomatis.
+          </div>
+          <textarea value={chatText} onChange={e => onChatInput(e.target.value)} placeholder={"Contoh chat dari WhatsApp:\n\nKak mau ikut jastip Bangkok ya\nNama: Rina\nHP: 081234567890\nAlamat: Bogor\n\nMau order:\n1. Zara Dress warna Black size M harga 499rb\n2. Charles & Keith Bag warna Beige 1.250.000\n\nMakasih kak 🙏"} className="w-full min-h-[140px] md:min-h-[110px] p-[13px] border border-[#e2e8f0] rounded-xl text-[13px] md:text-[13.5px] leading-relaxed outline-none resize-y bg-[#fafbfd]" />
+          <button onClick={onParseChat} className="mt-3 w-full md:w-auto inline-flex items-center justify-center gap-2 py-[12px] px-[20px] border-none rounded-[11px] text-white text-[13.5px] font-bold cursor-pointer transition-colors" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)' }}>
             {parsing ? <span className="w-[15px] h-[15px] border-2 border-white/40 border-t-white rounded-full inline-block animate-[spin_.7s_linear_infinite]" /> : <SparkleIcon />}
-            Baca Chat & Isi Form
+            {parsing ? 'AI sedang membaca...' : 'Baca Chat dengan AI'}
           </button>
           {parsed && (
             <>
               <div className="mt-3.5 bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-[13px_15px] animate-slideup">
-                <div className="flex items-center gap-2 text-[13px] font-bold text-[#047857]">✨ AI berhasil membaca chat. Mohon review data sebelum disimpan.</div>
+                <div className="flex items-center gap-2 text-[13px] font-bold text-[#047857]">✨ AI berhasil membaca chat &amp; mengisi form otomatis!</div>
+                <div className="text-[11.5px] text-[#059669] mt-1">Cek data di bawah, pastikan semua sudah benar sebelum disimpan.</div>
               </div>
-              <div className="mt-2.5 bg-[#fffbeb] border border-[#fde68a] rounded-xl p-[11px_14px] text-xs text-[#92400e] leading-relaxed">⚠️ AI hanya membantu mengisi data. Admin tetap wajib mengecek kembali sebelum menyimpan.</div>
+              <div className="mt-2.5 bg-[#fffbeb] border border-[#fde68a] rounded-xl p-[11px_14px] text-[11.5px] text-[#92400e] leading-relaxed">AI bisa salah membaca — selalu cek ulang harga &amp; detail produk sebelum menyimpan order.</div>
             </>
           )}
         </div>
