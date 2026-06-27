@@ -571,11 +571,24 @@ export default function JastipApp() {
               }
             }}
             onSaveOngkir={(weight: number, shipCost: number) => {
-              setState(s => ({
-                ...s,
-                orders: s.orders.map(o => o.orderId === s.selectedOrderId ? { ...o, weight, shipCost } : o),
-              }));
-              persist(() => db.updateOrderFields(state.selectedOrderId, { weight, shipCost }));
+              setState(s => {
+                const orders = s.orders.map(o => {
+                  if (o.orderId !== s.selectedOrderId) return o;
+                  const oldShipCost = o.shipCost || 0;
+                  const diff = shipCost - oldShipCost;
+                  const totalAmount = o.totalAmount + diff;
+                  const remainingAmount = totalAmount - o.paidAmount;
+                  return { ...o, weight, shipCost, totalAmount, remainingAmount };
+                });
+                return { ...s, orders };
+              });
+              const o = state.orders.find(x => x.orderId === state.selectedOrderId);
+              if (o) {
+                const diff = shipCost - (o.shipCost || 0);
+                const totalAmount = o.totalAmount + diff;
+                const remainingAmount = totalAmount - o.paidAmount;
+                persist(() => db.updateOrderFields(o.orderId, { weight, shipCost, totalAmount, remainingAmount }));
+              }
             }}
             storeName={state.storeName}
             bankInfo={state.bankInfo}
