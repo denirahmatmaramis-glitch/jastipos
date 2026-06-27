@@ -132,7 +132,9 @@ export function buildInvoiceText(o: Order, storeName: string, bankInfo: string):
   const lines = o.items.map((it, i) =>
     `${i + 1}. ${it.productName} ${it.color !== '-' ? it.color : ''} ${it.size !== '-' ? it.size : ''}\n   Qty: ${it.qty}\n   Harga: ${rp(it.priceInIdr)}\n   Fee Jastip: ${rp(it.jastipFee)}`
   ).join('\n');
-  return `Halo Kak ${o.customerName}, berikut invoice order jastip kamu:\n\nInvoice: ${o.invoiceNo}\nBatch: ${o.batchName}\n\nProduk:\n${lines}\n\nTotal Order: ${rp(o.totalAmount)}\nDP Minimal: ${rp(Math.round(o.totalAmount * o.dpPercent / 100))}\nSudah Dibayar: ${rp(o.paidAmount)}\nSisa Pelunasan: ${rp(o.remainingAmount)}\n\nPembayaran:\n${bankInfo}\n\nCatatan:\nOrder yang sudah dibelikan tidak bisa dibatalkan.\nPelunasan wajib dilakukan sebelum barang dikirim.`;
+  const subtotal = o.totalAmount - (o.shipCost || 0);
+  const ongkirLine = o.shipCost ? `\nOngkir: ${rp(o.shipCost)}` : '';
+  return `Halo Kak ${o.customerName}, berikut invoice order jastip kamu:\n\nInvoice: ${o.invoiceNo}\nBatch: ${o.batchName}\n\nProduk:\n${lines}\n\nSubtotal Barang: ${rp(subtotal)}${ongkirLine}\nTotal Order: ${rp(o.totalAmount)}\nSudah Dibayar: ${rp(o.paidAmount)}\nSisa Pelunasan: ${rp(o.remainingAmount)}\n\nPembayaran:\n${bankInfo}\n\nCatatan:\nOrder yang sudah dibelikan tidak bisa dibatalkan.\nPelunasan wajib dilakukan sebelum barang dikirim.`;
 }
 
 export const PAY_STATUSES = ['Menunggu DP', 'DP Diterima', 'Menunggu Pelunasan', 'Lunas', 'Refund'];

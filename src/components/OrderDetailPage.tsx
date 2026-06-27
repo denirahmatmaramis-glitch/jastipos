@@ -304,6 +304,8 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
               })}
             </div>
             <div className="mt-3.5 flex flex-col gap-[7px] text-[13px]">
+              <div className="flex justify-between"><span className="text-[#64748b]">Subtotal Barang</span><b>{rp(o.totalAmount - (o.shipCost || 0))}</b></div>
+              {o.shipCost > 0 && <div className="flex justify-between"><span className="text-[#64748b]">Ongkir</span><b>{rp(o.shipCost)}</b></div>}
               <div className="flex justify-between"><span className="text-[#64748b]">Total Order</span><b>{rp(o.totalAmount)}</b></div>
               <div className="flex justify-between"><span className="text-[#64748b]">Sudah Dibayar</span><b className="text-[#16a34a]">{rp(o.paidAmount)}</b></div>
               <div className="flex justify-between"><span className="text-[#64748b]">Sisa Pelunasan</span><b className="text-[#d97706]">{rp(o.remainingAmount)}</b></div>
