@@ -624,7 +624,7 @@ export default function JastipApp() {
         )}
       </main>
 
-      <BottomNav route={state.route} onNav={nav} userEmail={userEmail} />
+      <BottomNav route={state.route} onNav={nav} userEmail={userEmail} onLogout={handleLogout} />
       <Toast message={state.toast} />
     </div>
   );

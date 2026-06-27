@@ -124,10 +124,10 @@ const moreMenuItems: [Route, string, () => ReactNode][] = [
   ['store-settings', 'Pengaturan Toko', StoreIcon],
   ['payments', 'Pembayaran', PaymentsIcon],
   ['reports', 'Laporan', ReportsIcon],
-  ['admin', 'Panel Admin', AdminIcon],
+  ['admin', 'Super Admin', AdminIcon],
 ];
 
-export function BottomNav({ route, onNav, userEmail }: { route: Route; onNav: (r: Route) => void; userEmail?: string }) {
+export function BottomNav({ route, onNav, userEmail, onLogout }: { route: Route; onNav: (r: Route) => void; userEmail?: string; onLogout?: () => void }) {
   const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
   const activePage = route === 'detail' ? 'orders' : route;
   const [showMore, setShowMore] = useState(false);
@@ -152,6 +152,19 @@ export function BottomNav({ route, onNav, userEmail }: { route: Route; onNav: (r
                   <span className="text-[10px] font-semibold leading-tight text-center">{label}</span>
                 </button>
               ))}
+            </div>
+            {/* User info + Logout */}
+            <div className="border-t border-white/10 mt-2.5 pt-2.5 flex items-center justify-between px-1">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-7 h-7 rounded-full bg-[#6366f1] text-white flex items-center justify-center font-bold text-[11px] shrink-0">{(userEmail || 'U')[0].toUpperCase()}</div>
+                <span className="text-[11px] text-white/70 truncate">{userEmail}</span>
+              </div>
+              {onLogout && (
+                <button onClick={() => { setShowMore(false); onLogout(); }} className="flex items-center gap-1.5 py-1.5 px-3 border border-white/15 rounded-[8px] bg-transparent text-[#f87171] text-[11px] font-bold cursor-pointer">
+                  <LogoutIcon />
+                  Keluar
+                </button>
+              )}
             </div>
           </div>
         </div>
