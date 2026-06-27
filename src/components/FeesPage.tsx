@@ -54,8 +54,18 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
   const setField = (k: keyof FeeConfig, v: number) => setWorking(w => ({ ...w, [k]: v }));
 
   const updateTier = (i: number, patch: Partial<{ from: number; upTo: number; fee: number; isPercent: boolean }>) =>
-    setWorking(w => ({ ...w, tiers: w.tiers.map((t, idx) => idx === i ? { ...t, ...patch } : t) }));
-  const addTier = () => setWorking(w => ({ ...w, tiers: [...w.tiers, { from: 0, upTo: 0, fee: 0, isPercent: false }] }));
+    setWorking(w => {
+      const tiers = w.tiers.map((t, idx) => idx === i ? { ...t, ...patch } : t);
+      if (patch.upTo !== undefined && patch.upTo > 0 && i < tiers.length - 1) {
+        tiers[i + 1] = { ...tiers[i + 1], from: patch.upTo + 1 };
+      }
+      return { ...w, tiers };
+    });
+  const addTier = () => setWorking(w => {
+    const lastTier = w.tiers[w.tiers.length - 1];
+    const nextFrom = lastTier && lastTier.upTo > 0 ? lastTier.upTo + 1 : 0;
+    return { ...w, tiers: [...w.tiers, { from: nextFrom, upTo: 0, fee: 0, isPercent: false }] };
+  });
   const removeTier = (i: number) => setWorking(w => ({ ...w, tiers: w.tiers.filter((_, idx) => idx !== i) }));
 
   const save = () => {
