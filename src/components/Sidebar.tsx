@@ -107,6 +107,10 @@ function MoreIcon() {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg>;
 }
 
+function AdminIcon() {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+
 const moreMenuItems: [Route, string, () => ReactNode][] = [
   ['customers', 'Customer', CustomersIcon],
   ['batches', 'Batch Jastip', BatchesIcon],
@@ -115,6 +119,7 @@ const moreMenuItems: [Route, string, () => ReactNode][] = [
   ['store-settings', 'Pengaturan Toko', StoreIcon],
   ['payments', 'Pembayaran', PaymentsIcon],
   ['reports', 'Laporan', ReportsIcon],
+  ['admin', 'Panel Admin', AdminIcon],
 ];
 
 export function BottomNav({ route, onNav }: { route: Route; onNav: (r: Route) => void }) {
