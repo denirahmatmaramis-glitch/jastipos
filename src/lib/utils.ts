@@ -52,14 +52,13 @@ export function ordBadge(s: string): [string, string] {
 
 export function buildSteps(status: string) {
   const map: Record<string, number> = {
-    'Menunggu DP': 0, 'DP Diterima': 1, 'Menunggu Pembelian': 1, 'Sudah Dibeli': 2,
-    'Dalam Perjalanan ke Admin': 3, 'Barang Tiba': 4, 'Menunggu Pelunasan': 5,
-    'Siap Dikirim': 6, 'Dikirim ke Customer': 7, 'Selesai': 8, 'Cancel/Refund': 99
+    'Menunggu DP': 0, 'DP Diterima': 1, 'Menunggu Pelunasan': 2,
+    'Menunggu Pembelian': 1, 'Sudah Dibeli': 3,
+    'Siap Dikirim': 4, 'Dikirim ke Customer': 5, 'Selesai': 6, 'Cancel/Refund': 99
   };
   const labels = [
-    'Order diterima', 'DP sudah diterima', 'Barang sudah dibeli',
-    'Dalam perjalanan ke admin', 'Barang tiba', 'Menunggu pelunasan',
-    'Siap dikirim', 'Dikirim ke customer', 'Selesai'
+    'Order diterima', 'DP sudah diterima', 'Menunggu pelunasan',
+    'Barang sudah dibeli', 'Siap dikirim', 'Dikirim ke customer', 'Selesai'
   ];
   const cur = map[status] ?? 0;
   return labels.map((l, i) => {
@@ -85,7 +84,7 @@ export function buildInvoiceText(o: Order, storeName: string, bankInfo: string):
 }
 
 export const PAY_STATUSES = ['Menunggu DP', 'DP Diterima', 'Menunggu Pelunasan', 'Lunas', 'Refund'];
-export const ORDER_STATUSES = ['Menunggu DP', 'DP Diterima', 'Menunggu Pembelian', 'Sudah Dibeli', 'Dalam Perjalanan ke Admin', 'Barang Tiba', 'Menunggu Pelunasan', 'Siap Dikirim', 'Dikirim ke Customer', 'Selesai', 'Cancel/Refund'];
+export const ORDER_STATUSES = ['Menunggu DP', 'DP Diterima', 'Menunggu Pelunasan', 'Menunggu Pembelian', 'Sudah Dibeli', 'Siap Dikirim', 'Dikirim ke Customer', 'Selesai', 'Cancel/Refund'];
 
 export function emptyItem(): OrderItem {
   return { productName: '', brandStore: '', productLink: '', color: '', size: '', qty: 1, priceInIdr: 0, jastipFee: 0, localShipping: 0, intlShipping: 0, otherFee: 0, purchaseStatus: 'Menunggu Pembelian' };

@@ -282,7 +282,6 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
                   <div className="flex-1"><label className={lblSmCls}>Metode</label><select value={payForm.method} onChange={e => onPayFormChange('method', e.target.value)} className={inpSmCls}><option>Transfer BCA</option><option>Mandiri</option><option>QRIS</option><option>Cash</option></select></div>
                   <div className="flex-1"><label className={lblSmCls}>Jenis</label><select value={payForm.type} onChange={e => onPayFormChange('type', e.target.value)} className={inpSmCls}><option>DP</option><option>Pelunasan</option><option>Tambahan Ongkir</option><option>Refund</option></select></div>
                 </div>
-                <div><label className={lblSmCls}>Bukti Transfer (dummy)</label><div onClick={() => onToast('Fitur ini akan tersedia di versi berikutnya')} className="border border-dashed border-[#cbd5e1] rounded-[10px] py-4 text-center text-xs text-[#94a3b8] cursor-pointer">&#128206; Upload bukti transfer</div></div>
                 <button onClick={onAddPayment} className="py-[11px] border-none rounded-[10px] bg-[#16a34a] text-white text-[13px] font-bold cursor-pointer hover:bg-[#15803d] transition-colors">+ Catat Pembayaran</button>
               </div>
             </div>
