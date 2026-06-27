@@ -124,6 +124,7 @@ const moreMenuItems: [Route, string, () => ReactNode][] = [
   ['store-settings', 'Pengaturan Toko', StoreIcon],
   ['payments', 'Pembayaran', PaymentsIcon],
   ['reports', 'Laporan', ReportsIcon],
+  ['upgrade', 'Upgrade Pro', () => <span className="text-[16px]">⭐</span>],
   ['admin', 'Super Admin', AdminIcon],
 ];
 
