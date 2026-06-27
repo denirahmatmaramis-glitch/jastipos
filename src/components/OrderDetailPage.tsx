@@ -380,7 +380,6 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
               <div><label className={lblCls}>Kurir</label><input value={o.courier} onChange={e => onShipFieldChange('courier', e.target.value)} placeholder="JNE / J&T / SiCepat" className={inpCls} /></div>
               <div><label className={lblCls}>Nomor Resi</label><input value={o.resi} onChange={e => onShipFieldChange('resi', e.target.value)} placeholder="cth. JNE0099" className={inpCls} /></div>
               <div><label className={lblCls}>Tanggal Kirim</label><input type="date" value={o.shipDate} onChange={e => onShipFieldChange('shipDate', e.target.value)} className={inpCls} /></div>
-              <div><label className={lblCls}>Status Pengiriman</label><select value={o.shipStatus} onChange={e => onShipFieldChange('shipStatus', e.target.value)} className={inpCls}><option>Belum dikirim</option><option>Dikirim</option><option>Diterima customer</option></select></div>
             </div>
             <button onClick={onSaveShip} className="mt-3 py-2.5 px-[16px] border-none rounded-[10px] bg-[#4f46e5] text-white text-[13px] font-bold cursor-pointer hover:bg-[#4338ca] transition-colors">Simpan Pengiriman</button>
           </div>
