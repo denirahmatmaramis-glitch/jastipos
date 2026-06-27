@@ -22,8 +22,10 @@ import ReportsPage from './ReportsPage';
 import FeesPage from './FeesPage';
 import TemplatesPage from './TemplatesPage';
 import UpgradePage from './UpgradePage';
-import AdminPage from './AdminPage';
+import SuperAdminPage from './SuperAdminPage';
 import StoreSettingsPage from './StoreSettingsPage';
+
+const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '';
 
 const titles: Record<string, [string, string]> = {
   dashboard: ['Dashboard', 'Ringkasan operasional jastip kamu hari ini'],
@@ -54,6 +56,7 @@ const emptyState: AppState = {
 export default function JastipApp() {
   const [state, setState] = useState<AppState>(emptyState);
   const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [appLoading, setAppLoading] = useState(true);
@@ -105,6 +108,7 @@ export default function JastipApp() {
       const session = await db.getSession();
       if (session?.user) {
         setUserId(session.user.id);
+        setUserEmail(session.user.email || '');
         await loadData(session.user.id);
       }
       setAppLoading(false);
@@ -114,9 +118,11 @@ export default function JastipApp() {
       const s = session as { user?: { id: string } } | null;
       if (s?.user) {
         setUserId(s.user.id);
+        setUserEmail((s.user as { email?: string }).email || '');
         await loadData(s.user.id);
       } else {
         setUserId(null);
+        setUserEmail('');
         setState(prev => ({ ...emptyState, toast: prev.toast }));
       }
     });
@@ -135,6 +141,7 @@ export default function JastipApp() {
       const { user } = await db.signIn(email, password);
       if (user) {
         setUserId(user.id);
+        setUserEmail(user.email || '');
         await loadData(user.id);
       }
     } catch (e) {
@@ -154,6 +161,7 @@ export default function JastipApp() {
       const { user } = await db.signUp(email, password);
       if (user) {
         setUserId(user.id);
+        setUserEmail(user.email || '');
         await loadData(user.id);
       }
     } catch (e) {
@@ -229,7 +237,7 @@ export default function JastipApp() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar route={state.route} onNav={nav} onLogout={handleLogout} plan={state.plan} orderCount={state.orders.length} />
+      <Sidebar route={state.route} onNav={nav} onLogout={handleLogout} plan={state.plan} orderCount={state.orders.length} userEmail={userEmail} />
 
       <main className="jp-scroll flex-1 min-w-0 p-[26px_30px] max-md:p-[14px_14px_80px] max-h-screen overflow-y-auto">
         <div className="flex items-start justify-between gap-3 mb-4 md:mb-[22px] flex-wrap">
@@ -611,26 +619,12 @@ export default function JastipApp() {
           />
         )}
 
-        {state.route === 'admin' && (
-          <AdminPage
-            plan={state.plan}
-            upgradeStatus={state.upgradeStatus}
-            upgradeCode={state.upgradeCode}
-            onActivate={() => {
-              setState(s => ({ ...s, plan: 'pro', upgradeStatus: 'active' }));
-              if (userId) persist(() => db.updateProfile(userId, { plan: 'pro', upgrade_status: 'active' }));
-              toast('Akun diaktifkan ke Pro ✓');
-            }}
-            onResetFree={() => {
-              setState(s => ({ ...s, plan: 'free', upgradeStatus: 'none' }));
-              if (userId) persist(() => db.updateProfile(userId, { plan: 'free', upgrade_status: 'none' }));
-              toast('Akun direset ke Free (demo)');
-            }}
-          />
+        {state.route === 'admin' && userEmail === SUPER_ADMIN_EMAIL && (
+          <SuperAdminPage onToast={toast} />
         )}
       </main>
 
-      <BottomNav route={state.route} onNav={nav} />
+      <BottomNav route={state.route} onNav={nav} userEmail={userEmail} />
       <Toast message={state.toast} />
     </div>
   );

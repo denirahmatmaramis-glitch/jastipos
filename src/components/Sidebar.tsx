@@ -18,15 +18,19 @@ const navDef: [Route | 'create', string, () => ReactNode][] = [
   ['store-settings', 'Pengaturan Toko', StoreIcon],
 ];
 
+const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '';
+
 interface SidebarProps {
   route: Route;
   onNav: (r: Route) => void;
   onLogout: () => void;
   plan: Plan;
   orderCount: number;
+  userEmail?: string;
 }
 
-export default function Sidebar({ route, onNav, onLogout, plan, orderCount }: SidebarProps) {
+export default function Sidebar({ route, onNav, onLogout, plan, orderCount, userEmail }: SidebarProps) {
+  const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
   const activePage = route === 'detail' ? 'orders' : route;
   const used = Math.min(orderCount, FREE_ORDER_LIMIT);
   const pct = Math.round((used / FREE_ORDER_LIMIT) * 100);
@@ -85,14 +89,15 @@ export default function Sidebar({ route, onNav, onLogout, plan, orderCount }: Si
       </div>
 
       <div className="border-t border-white/10 pt-3 mt-3">
-        <a onClick={() => onNav('admin')} className="flex items-center gap-2.5 py-2 px-2 rounded-[9px] cursor-pointer text-[12px] font-semibold no-underline transition-colors hover:bg-white/[.07]" style={{ color: activePage === 'admin' ? '#fff' : 'rgba(199,202,240,.6)' }}>
-          <span className="w-[18px] flex justify-center">🛡️</span>Panel Admin
-        </a>
+        {isSuperAdmin && (
+          <a onClick={() => onNav('admin')} className="flex items-center gap-2.5 py-2 px-2 rounded-[9px] cursor-pointer text-[12px] font-semibold no-underline transition-colors hover:bg-white/[.07]" style={{ color: activePage === 'admin' ? '#fff' : 'rgba(199,202,240,.6)' }}>
+            <span className="w-[18px] flex justify-center">🛡️</span>Super Admin
+          </a>
+        )}
         <div className="flex items-center gap-2.5 px-2 py-1 mt-1">
-          <div className="w-8 h-8 rounded-full bg-[#6366f1] text-white flex items-center justify-center font-bold text-[13px]">O</div>
+          <div className="w-8 h-8 rounded-full bg-[#6366f1] text-white flex items-center justify-center font-bold text-[13px]">{(userEmail || 'U')[0].toUpperCase()}</div>
           <div className="flex-1 min-w-0">
-            <div className="text-white text-[12.5px] font-bold">Owner Jastip</div>
-            <div className="text-[#a5b4fc] text-[11px] truncate">owner@jastipos.id</div>
+            <div className="text-white text-[12.5px] font-bold truncate">{userEmail || 'User'}</div>
           </div>
           <button onClick={onLogout} title="Keluar" className="bg-transparent border-none text-[#a5b4fc] hover:text-white cursor-pointer p-1 transition-colors">
             <LogoutIcon />
@@ -122,7 +127,8 @@ const moreMenuItems: [Route, string, () => ReactNode][] = [
   ['admin', 'Panel Admin', AdminIcon],
 ];
 
-export function BottomNav({ route, onNav }: { route: Route; onNav: (r: Route) => void }) {
+export function BottomNav({ route, onNav, userEmail }: { route: Route; onNav: (r: Route) => void; userEmail?: string }) {
+  const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
   const activePage = route === 'detail' ? 'orders' : route;
   const [showMore, setShowMore] = useState(false);
   const mainItems: [Route, string, () => ReactNode][] = [
@@ -130,7 +136,8 @@ export function BottomNav({ route, onNav }: { route: Route; onNav: (r: Route) =>
     ['orders', 'Order', OrdersIcon],
     ['create', 'Buat', CreateIcon],
   ];
-  const isMoreActive = moreMenuItems.some(([k]) => k === activePage);
+  const visibleMore = isSuperAdmin ? moreMenuItems : moreMenuItems.filter(([k]) => k !== 'admin');
+  const isMoreActive = visibleMore.some(([k]) => k === activePage);
 
   return (
     <>
@@ -139,7 +146,7 @@ export function BottomNav({ route, onNav }: { route: Route; onNav: (r: Route) =>
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute bottom-[60px] left-2 right-2 rounded-[16px] p-3 animate-slideup" style={{ background: '#1e1b4b' }} onClick={e => e.stopPropagation()}>
             <div className="grid grid-cols-4 gap-2">
-              {moreMenuItems.map(([key, label, Icon]) => (
+              {visibleMore.map(([key, label, Icon]) => (
                 <button key={key} onClick={() => { onNav(key); setShowMore(false); }} className="bg-transparent border-none flex flex-col items-center gap-[5px] cursor-pointer py-2.5 px-1 rounded-[10px] transition-colors" style={{ color: key === activePage ? '#fff' : 'rgba(199,202,240,.7)', background: key === activePage ? 'rgba(129,140,248,.22)' : 'transparent' }}>
                   <Icon />
                   <span className="text-[10px] font-semibold leading-tight text-center">{label}</span>
