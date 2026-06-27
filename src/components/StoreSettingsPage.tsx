@@ -23,8 +23,16 @@ export default function StoreSettingsPage({ storeName, bankInfo, onSave, onToast
     onToast('Pengaturan toko disimpan ✓');
   };
 
+  const isNew = !bankInfo;
+
   return (
     <div className="max-w-[580px]">
+      {isNew && (
+        <div className="bg-[#eef2ff] border border-[#c7d2fe] rounded-[14px] p-4 mb-4">
+          <div className="text-[15px] font-bold text-[#3730a3] mb-1">Selamat datang di JastipOS! 🎉</div>
+          <div className="text-[12.5px] text-[#3730a3] leading-relaxed">Sebelum mulai, isi dulu nama toko dan rekening pembayaran kamu. Data ini akan tampil di invoice dan halaman tracking customer.</div>
+        </div>
+      )}
       <div className="bg-white border border-[#eef0f6] rounded-2xl p-5 mb-4">
         <h3 className="m-0 mb-1 text-[15px] font-bold">Identitas Toko</h3>
         <p className="m-0 mb-4 text-[12.5px] text-[#64748b] leading-relaxed">Nama toko dan info rekening ini akan tampil di invoice, halaman tracking customer, dan template WhatsApp.</p>

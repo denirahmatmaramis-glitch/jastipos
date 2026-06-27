@@ -77,10 +77,11 @@ export default function JastipApp() {
         db.getBatches(uid),
         db.getOrders(uid),
       ]);
+      const isNewUser = !profile?.bank_info;
       setState(s => ({
         ...s,
         authed: true,
-        route: 'dashboard',
+        route: isNewUser ? 'store-settings' : 'dashboard',
         customers,
         batches,
         orders,
