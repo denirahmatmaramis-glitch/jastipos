@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Draft, Batch, OrderItem, Customer } from '@/lib/types';
 import { rp, itemSubtotal, emptyItem, PAY_STATUSES, ORDER_STATUSES } from '@/lib/utils';
 import { SparkleIcon } from '@/lib/icons';
@@ -34,14 +34,23 @@ const numFields = ['qty', 'priceInIdr', 'jastipFee', 'otherFee'];
 export default function CreateOrderPage({ draft, batches, customers, chatText, parsing, parsed, onChatInput, onParseChat, onDraftField, onItemField, onAddItem, onRemoveItem, onSave, onPreviewLink, feeSummary, onAutoFee, onToast }: Props) {
   const d = draft;
   const [matchedCustomer, setMatchedCustomer] = useState<Customer | null>(null);
+  const [nameMismatch, setNameMismatch] = useState(false);
+  const [parsedName, setParsedName] = useState('');
 
-  const handlePhoneChange = (val: string) => {
-    onDraftField('phone', val);
-    const clean = val.replace(/\D/g, '');
+  const checkPhoneMatch = (phone: string, currentName?: string) => {
+    const clean = phone.replace(/\D/g, '');
     if (clean.length >= 4) {
       const found = customers.find(c => c.phone.replace(/\D/g, '') === clean);
       if (found) {
         setMatchedCustomer(found);
+        const nameToCheck = currentName || d.name;
+        if (nameToCheck && nameToCheck.trim().toLowerCase() !== found.name.trim().toLowerCase()) {
+          setNameMismatch(true);
+          setParsedName(nameToCheck);
+        } else {
+          setNameMismatch(false);
+          setParsedName('');
+        }
         onDraftField('name', found.name);
         onDraftField('address', found.address);
         onDraftField('instagram', found.instagram);
@@ -49,7 +58,33 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
       }
     }
     setMatchedCustomer(null);
+    setNameMismatch(false);
+    setParsedName('');
   };
+
+  const handlePhoneChange = (val: string) => {
+    onDraftField('phone', val);
+    checkPhoneMatch(val);
+  };
+
+  const useNewName = () => {
+    if (parsedName) onDraftField('name', parsedName);
+    setNameMismatch(false);
+  };
+
+  const keepExistingName = () => {
+    if (matchedCustomer) onDraftField('name', matchedCustomer.name);
+    setNameMismatch(false);
+  };
+  // After AI parse, check if phone matches existing customer
+  const prevParsed = useRef(parsed);
+  useEffect(() => {
+    if (parsed && !prevParsed.current && d.phone) {
+      checkPhoneMatch(d.phone, d.name);
+    }
+    prevParsed.current = parsed;
+  }, [parsed]);
+
   const tProduct = d.items.reduce((s, i) => s + i.priceInIdr * i.qty, 0);
   const tFee = d.items.reduce((s, i) => s + i.jastipFee, 0);
   const tOther = d.items.reduce((s, i) => s + (i.otherFee || 0), 0);
@@ -107,9 +142,21 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
                 {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </div>
-            {matchedCustomer && (
+            {matchedCustomer && !nameMismatch && (
               <div className="col-span-full bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-[11px_14px] text-[12.5px] text-[#047857]">
-                ✅ Customer ditemukan: <b>{matchedCustomer.name}</b> — data otomatis terisi. Order baru akan tercatat di history customer ini.
+                Customer ditemukan: <b>{matchedCustomer.name}</b> — data otomatis terisi. Order baru akan tercatat di history customer ini.
+              </div>
+            )}
+            {matchedCustomer && nameMismatch && (
+              <div className="col-span-full bg-[#fffbeb] border border-[#fde68a] rounded-xl p-[12px_14px]">
+                <div className="text-[12.5px] text-[#92400e] font-bold mb-1.5">Nama berbeda untuk nomor ini</div>
+                <div className="text-[12px] text-[#92400e] leading-relaxed mb-2.5">
+                  Nomor <b>{matchedCustomer.phone}</b> sudah terdaftar atas nama <b>{matchedCustomer.name}</b>, tapi di chat tertulis <b>{parsedName}</b>.
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={keepExistingName} className="flex-1 py-2 border border-[#d1fae5] bg-[#ecfdf5] text-[#059669] rounded-[9px] text-[11.5px] font-bold cursor-pointer">Pakai &quot;{matchedCustomer.name}&quot;</button>
+                  <button onClick={useNewName} className="flex-1 py-2 border border-[#c7d2fe] bg-[#eef2ff] text-[#4f46e5] rounded-[9px] text-[11.5px] font-bold cursor-pointer">Ganti ke &quot;{parsedName}&quot;</button>
+                </div>
               </div>
             )}
             <div className="col-span-full"><label className={lblCls}>Catatan Customer</label><input value={d.custNotes} onChange={e => onDraftField('custNotes', e.target.value)} placeholder="cth. minta dikabari kalau sold out" className={inpCls} /></div>
