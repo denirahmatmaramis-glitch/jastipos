@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Batch, FeeConfig, FeeType } from '@/lib/types';
 import { feeConfigSummary } from '@/lib/utils';
+import NumInput from './NumInput';
 
 interface Props {
   globalFee: FeeConfig;
@@ -136,7 +137,7 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
                   <label className={labelCls}>Fee tetap per item</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13.5px] text-[#94a3b8] font-semibold">Rp</span>
-                    <input type="number" value={working.flatFee} onChange={e => setField('flatFee', +e.target.value || 0)} className={inputCls + ' pl-9'} />
+                    <NumInput value={working.flatFee} onChange={v => setField('flatFee', v)} className={inputCls + ' pl-9'} />
                   </div>
                 </div>
                 <div className="bg-[#f5f3ff] border border-[#e0e7ff] rounded-[10px] p-3 text-[11.5px] md:text-[12px] text-[#4338ca]">Contoh: 2 pcs → fee <b>Rp{(working.flatFee * 2).toLocaleString('id-ID')}</b></div>
@@ -151,7 +152,7 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
                   <div>
                     <label className={labelCls}>Persentase</label>
                     <div className="relative">
-                      <input type="number" value={working.percent} onChange={e => setField('percent', +e.target.value || 0)} className={inputCls + ' pr-9'} />
+                      <NumInput value={working.percent} onChange={v => setField('percent', v)} className={inputCls + ' pr-9'} />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13.5px] text-[#94a3b8] font-semibold">%</span>
                     </div>
                   </div>
@@ -159,7 +160,7 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
                     <label className={labelCls}>Fee minimum</label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13.5px] text-[#94a3b8] font-semibold">Rp</span>
-                      <input type="number" value={working.percentMin} onChange={e => setField('percentMin', +e.target.value || 0)} className={inputCls + ' pl-9'} />
+                      <NumInput value={working.percentMin} onChange={v => setField('percentMin', v)} className={inputCls + ' pl-9'} />
                     </div>
                   </div>
                 </div>
@@ -179,17 +180,17 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
                     <div key={i} className="grid grid-cols-[1fr_1fr_120px_88px_28px] gap-2 items-center bg-[#fafbfd] border border-[#eef0f6] rounded-[11px] p-[8px_10px] mt-2">
                       <div className="relative">
                         <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#94a3b8] font-semibold">Rp</span>
-                        <input type="number" value={t.from} onChange={e => updateTier(i, { from: +e.target.value || 0 })} className="w-full py-2 pl-8 pr-2 border border-[#e2e8f0] rounded-[8px] text-[13px] font-semibold outline-none bg-white" />
+                        <NumInput value={t.from} onChange={v => updateTier(i, { from: v })} className="w-full py-2 pl-8 pr-2 border border-[#e2e8f0] rounded-[8px] text-[13px] font-semibold outline-none bg-white" />
                       </div>
                       {t.upTo === 0 ? (
                         <div className="py-2 px-2.5 text-[13px] font-semibold text-[#64748b]">∞ ke atas</div>
                       ) : (
                         <div className="relative">
                           <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#94a3b8] font-semibold">Rp</span>
-                          <input type="number" value={t.upTo} onChange={e => updateTier(i, { upTo: +e.target.value || 0 })} className="w-full py-2 pl-8 pr-2 border border-[#e2e8f0] rounded-[8px] text-[13px] font-semibold outline-none bg-white" />
+                          <NumInput value={t.upTo} onChange={v => updateTier(i, { upTo: v })} className="w-full py-2 pl-8 pr-2 border border-[#e2e8f0] rounded-[8px] text-[13px] font-semibold outline-none bg-white" />
                         </div>
                       )}
-                      <input type="number" value={t.fee} onChange={e => updateTier(i, { fee: +e.target.value || 0 })} className="w-full py-2 px-2.5 border border-[#e2e8f0] rounded-[8px] text-[13px] font-bold text-[#4f46e5] outline-none bg-white" />
+                      <NumInput value={t.fee} onChange={v => updateTier(i, { fee: v })} className="w-full py-2 px-2.5 border border-[#e2e8f0] rounded-[8px] text-[13px] font-bold text-[#4f46e5] outline-none bg-white" />
                       <select value={t.isPercent ? 'pct' : 'rp'} onChange={e => updateTier(i, { isPercent: e.target.value === 'pct' })} className="w-full py-2 px-1.5 border border-[#e2e8f0] rounded-[8px] text-[12.5px] outline-none bg-white">
                         <option value="rp">Rp</option>
                         <option value="pct">%</option>
@@ -214,7 +215,7 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
                           <label className="block text-[10.5px] font-semibold text-[#94a3b8] mb-1">Harga dari</label>
                           <div className="relative">
                             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-[#94a3b8] font-semibold">Rp</span>
-                            <input type="number" value={t.from} onChange={e => updateTier(i, { from: +e.target.value || 0 })} className={inputSmCls + ' pl-7 text-[12.5px]'} />
+                            <NumInput value={t.from} onChange={v => updateTier(i, { from: v })} className={inputSmCls + ' pl-7 text-[12.5px]'} />
                           </div>
                         </div>
                         <div>
@@ -224,13 +225,13 @@ export default function FeesPage({ globalFee, batches, onSaveGlobal, onSaveBatch
                           ) : (
                             <div className="relative">
                               <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-[#94a3b8] font-semibold">Rp</span>
-                              <input type="number" value={t.upTo} onChange={e => updateTier(i, { upTo: +e.target.value || 0 })} className={inputSmCls + ' pl-7 text-[12.5px]'} />
+                              <NumInput value={t.upTo} onChange={v => updateTier(i, { upTo: v })} className={inputSmCls + ' pl-7 text-[12.5px]'} />
                             </div>
                           )}
                         </div>
                         <div>
                           <label className="block text-[10.5px] font-semibold text-[#94a3b8] mb-1">Fee</label>
-                          <input type="number" value={t.fee} onChange={e => updateTier(i, { fee: +e.target.value || 0 })} className={inputSmCls + ' text-[12.5px] font-bold text-[#4f46e5]'} />
+                          <NumInput value={t.fee} onChange={v => updateTier(i, { fee: v })} className={inputSmCls + ' text-[12.5px] font-bold text-[#4f46e5]'} />
                         </div>
                         <div>
                           <label className="block text-[10.5px] font-semibold text-[#94a3b8] mb-1">Satuan</label>

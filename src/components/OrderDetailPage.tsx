@@ -5,6 +5,7 @@ import { Order, Batch, DetailTab, OrderItem } from '@/lib/types';
 import { rp, dt, payBadge, ordBadge, buildSteps, buildInvoiceText, waLink, copyText, itemSubtotal, emptyItem, PAY_STATUSES, ORDER_STATUSES } from '@/lib/utils';
 import { downloadInvoicePdf } from '@/lib/export';
 import { LinkIcon } from '@/lib/icons';
+import NumInput from './NumInput';
 
 interface Props {
   order: Order;
@@ -159,10 +160,10 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
                 <div><label className={lblSmCls}>Brand / Store</label><input value={editItem.brandStore} onChange={e => setEditItem({ ...editItem, brandStore: e.target.value })} className={inpSmCls} /></div>
                 <div><label className={lblSmCls}>Warna</label><input value={editItem.color} onChange={e => setEditItem({ ...editItem, color: e.target.value })} className={inpSmCls} /></div>
                 <div><label className={lblSmCls}>Size</label><input value={editItem.size} onChange={e => setEditItem({ ...editItem, size: e.target.value })} className={inpSmCls} /></div>
-                <div><label className={lblSmCls}>Qty</label><input type="number" value={editItem.qty} onChange={e => setEditItem({ ...editItem, qty: +e.target.value || 0 })} className={inpSmCls} /></div>
-                <div><label className={lblSmCls}>Harga (Rp)</label><input type="number" value={editItem.priceInIdr} onChange={e => setEditItem({ ...editItem, priceInIdr: +e.target.value || 0 })} className={inpSmCls} /></div>
-                <div><label className={lblSmCls}>Fee Jastip</label><input type="number" value={editItem.jastipFee} onChange={e => setEditItem({ ...editItem, jastipFee: +e.target.value || 0 })} className={inpSmCls} /></div>
-                <div><label className={lblSmCls}>Biaya Lain</label><input type="number" value={editItem.otherFee} onChange={e => setEditItem({ ...editItem, otherFee: +e.target.value || 0 })} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Qty</label><NumInput value={editItem.qty} onChange={v => setEditItem({ ...editItem, qty: v })} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Harga (Rp)</label><NumInput value={editItem.priceInIdr} onChange={v => setEditItem({ ...editItem, priceInIdr: v })} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Fee Jastip</label><NumInput value={editItem.jastipFee} onChange={v => setEditItem({ ...editItem, jastipFee: v })} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Biaya Lain</label><NumInput value={editItem.otherFee} onChange={v => setEditItem({ ...editItem, otherFee: v })} className={inpSmCls} /></div>
                 <div>
                   <label className={lblSmCls}>Status Pembelian</label>
                   <select value={editItem.purchaseStatus} onChange={e => setEditItem({ ...editItem, purchaseStatus: e.target.value as OrderItem['purchaseStatus'] })} className={inpSmCls}>
@@ -193,10 +194,10 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
                 <div><label className={lblSmCls}>Brand / Store</label><input value={newItem.brandStore} onChange={e => setNewItem({ ...newItem, brandStore: e.target.value })} className={inpSmCls} /></div>
                 <div><label className={lblSmCls}>Warna</label><input value={newItem.color} onChange={e => setNewItem({ ...newItem, color: e.target.value })} className={inpSmCls} /></div>
                 <div><label className={lblSmCls}>Size</label><input value={newItem.size} onChange={e => setNewItem({ ...newItem, size: e.target.value })} className={inpSmCls} /></div>
-                <div><label className={lblSmCls}>Qty</label><input type="number" value={newItem.qty} onChange={e => setNewItem({ ...newItem, qty: +e.target.value || 0 })} className={inpSmCls} /></div>
-                <div><label className={lblSmCls}>Harga (Rp)</label><input type="number" value={newItem.priceInIdr} onChange={e => setNewItem({ ...newItem, priceInIdr: +e.target.value || 0 })} className={inpSmCls} /></div>
-                <div><label className={lblSmCls}>Fee Jastip</label><input type="number" value={newItem.jastipFee} onChange={e => setNewItem({ ...newItem, jastipFee: +e.target.value || 0 })} className={inpSmCls} /></div>
-                <div><label className={lblSmCls}>Biaya Lain</label><input type="number" value={newItem.otherFee} onChange={e => setNewItem({ ...newItem, otherFee: +e.target.value || 0 })} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Qty</label><NumInput value={newItem.qty} onChange={v => setNewItem({ ...newItem, qty: v })} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Harga (Rp)</label><NumInput value={newItem.priceInIdr} onChange={v => setNewItem({ ...newItem, priceInIdr: v })} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Fee Jastip</label><NumInput value={newItem.jastipFee} onChange={v => setNewItem({ ...newItem, jastipFee: v })} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Biaya Lain</label><NumInput value={newItem.otherFee} onChange={v => setNewItem({ ...newItem, otherFee: v })} className={inpSmCls} /></div>
               </div>
               <div className="flex justify-between items-center mt-3 pt-3 border-t border-[#eef0f6]">
                 <span className="text-xs text-[#64748b]">Subtotal: <b className="text-[#4f46e5]">{rp(itemSubtotal(newItem))}</b></span>
@@ -241,7 +242,7 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
             <div className="bg-white border border-[#eef0f6] rounded-2xl p-5">
               <h3 className="m-0 mb-3.5 text-[15px] font-bold">Tambah Pembayaran</h3>
               <div className="flex flex-col gap-[11px]">
-                <div><label className={lblSmCls}>Jumlah Bayar</label><input type="number" value={payForm.amount} onChange={e => onPayFormChange('amount', e.target.value)} className={inpSmCls} /></div>
+                <div><label className={lblSmCls}>Jumlah Bayar</label><NumInput value={+(payForm.amount) || 0} onChange={v => onPayFormChange('amount', String(v))} className={inpSmCls} /></div>
                 <div className="flex gap-2.5">
                   <div className="flex-1"><label className={lblSmCls}>Metode</label><select value={payForm.method} onChange={e => onPayFormChange('method', e.target.value)} className={inpSmCls}><option>Transfer</option><option>QRIS</option><option>Cash</option></select></div>
                   <div className="flex-1"><label className={lblSmCls}>Jenis</label><select value={payForm.type} onChange={e => onPayFormChange('type', e.target.value)} className={inpSmCls}><option>DP</option><option>Pelunasan</option><option>Tambahan Ongkir</option><option>Refund</option></select></div>
@@ -358,14 +359,14 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
             <div className="grid grid-cols-2 gap-[13px]">
               <div>
                 <label className={lblCls}>Berat Paket (gram)</label>
-                <input type="number" value={ongkirWeight} onChange={e => setOngkirWeight(+e.target.value || 0)} placeholder="cth. 1500" className={inpCls} />
+                <NumInput value={ongkirWeight} onChange={v => setOngkirWeight(v)} className={inpCls} placeholder="cth. 1.500" />
                 {ongkirWeight > 0 && <div className="text-[11.5px] text-[#64748b] mt-1">{(ongkirWeight / 1000).toFixed(1)} kg</div>}
               </div>
               <div>
                 <label className={lblCls}>Total Ongkir (Rp)</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13.5px] text-[#94a3b8] font-semibold">Rp</span>
-                  <input type="number" value={ongkirCost} onChange={e => setOngkirCost(+e.target.value || 0)} className={inpCls + ' pl-9'} />
+                  <NumInput value={ongkirCost} onChange={v => setOngkirCost(v)} className={inpCls + ' pl-9'} />
                 </div>
               </div>
             </div>

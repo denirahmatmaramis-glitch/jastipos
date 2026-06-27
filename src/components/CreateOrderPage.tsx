@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Draft, Batch, OrderItem, Customer } from '@/lib/types';
+import NumInput from './NumInput';
 import { rp, itemSubtotal, emptyItem, PAY_STATUSES, ORDER_STATUSES } from '@/lib/utils';
 import { SparkleIcon } from '@/lib/icons';
 
@@ -203,10 +204,10 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
                   <div><label className={lblSmCls}>Link Produk</label><input value={it.productLink} onChange={e => onItemField(idx, 'productLink', e.target.value)} placeholder="https://" className={inpSmCls} /></div>
                   <div><label className={lblSmCls}>Warna</label><input value={it.color} onChange={e => onItemField(idx, 'color', e.target.value)} className={inpSmCls} /></div>
                   <div><label className={lblSmCls}>Size</label><input value={it.size} onChange={e => onItemField(idx, 'size', e.target.value)} className={inpSmCls} /></div>
-                  <div><label className={lblSmCls}>Qty</label><input type="number" value={it.qty} onChange={e => onItemField(idx, 'qty', +e.target.value || 0)} className={inpSmCls} /></div>
-                  <div><label className={lblSmCls}>Harga (Rp)</label><input type="number" value={it.priceInIdr} onChange={e => onItemField(idx, 'priceInIdr', +e.target.value || 0)} className={inpSmCls} /></div>
-                  <div><label className={lblSmCls}>Fee Jastip</label><input type="number" value={it.jastipFee} onChange={e => onItemField(idx, 'jastipFee', +e.target.value || 0)} className={inpSmCls} /></div>
-                  <div><label className={lblSmCls}>Biaya Lain</label><input type="number" value={it.otherFee} onChange={e => onItemField(idx, 'otherFee', +e.target.value || 0)} className={inpSmCls} /></div>
+                  <div><label className={lblSmCls}>Qty</label><NumInput value={it.qty} onChange={v => onItemField(idx, 'qty', v)} className={inpSmCls} /></div>
+                  <div><label className={lblSmCls}>Harga (Rp)</label><NumInput value={it.priceInIdr} onChange={v => onItemField(idx, 'priceInIdr', v)} className={inpSmCls} /></div>
+                  <div><label className={lblSmCls}>Fee Jastip</label><NumInput value={it.jastipFee} onChange={v => onItemField(idx, 'jastipFee', v)} className={inpSmCls} /></div>
+                  <div><label className={lblSmCls}>Biaya Lain</label><NumInput value={it.otherFee} onChange={v => onItemField(idx, 'otherFee', v)} className={inpSmCls} /></div>
                 </div>
                 <div className="flex justify-end items-center gap-2 mt-3 pt-[11px] border-t border-[#eef0f6]">
                   <span className="text-xs text-[#64748b]">Subtotal item</span>
@@ -239,7 +240,7 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
           {d.dpPercent < 100 && (
             <div>
               <label className={lblCls}>DP Minimal (%)</label>
-              <input type="number" value={d.dpPercent} onChange={e => onDraftField('dpPercent', +e.target.value || 0)} className={inpCls} />
+              <NumInput value={d.dpPercent} onChange={v => onDraftField('dpPercent', v)} className={inpCls} />
             </div>
           )}
           <div className="flex flex-col gap-[9px] text-[13px] mt-3">
