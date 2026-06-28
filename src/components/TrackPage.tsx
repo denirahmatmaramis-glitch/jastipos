@@ -46,28 +46,53 @@ export default function TrackPage({ order: o, batches, authed, storeName, onBack
         </div>
 
         {/* status card */}
-        <div className="rounded-[18px] p-[22px] text-white" style={{ background: isSelesai ? 'linear-gradient(135deg, #059669, #16a34a)' : 'linear-gradient(135deg, #4f46e5, #6366f1)', boxShadow: isSelesai ? '0 16px 36px rgba(22,163,106,.3)' : '0 16px 36px rgba(79,70,229,.35)' }}>
-          {isSelesai ? (
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-[40px] h-[40px] rounded-full bg-white/20 flex items-center justify-center text-[20px]">&#10003;</div>
-              <div>
-                <div className="text-[11px] opacity-85">Status order</div>
-                <div className="text-xl font-extrabold">Selesai</div>
+        {(() => {
+          const isCancelled = o.orderStatus === 'Cancel/Refund';
+          const refundTotal = o.payments.filter(p => p.type === 'Refund').reduce((s, p) => s + p.amount, 0);
+          const bg = isCancelled ? 'linear-gradient(135deg, #b91c1c, #ef4444)' : isSelesai ? 'linear-gradient(135deg, #059669, #16a34a)' : 'linear-gradient(135deg, #4f46e5, #6366f1)';
+          const shadow = isCancelled ? '0 16px 36px rgba(185,28,28,.3)' : isSelesai ? '0 16px 36px rgba(22,163,106,.3)' : '0 16px 36px rgba(79,70,229,.35)';
+          return (
+            <div className="rounded-[18px] p-[22px] text-white" style={{ background: bg, boxShadow: shadow }}>
+              {isCancelled ? (
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-[40px] h-[40px] rounded-full bg-white/20 flex items-center justify-center text-[20px]">&#10005;</div>
+                  <div>
+                    <div className="text-[11px] opacity-85">Status order</div>
+                    <div className="text-xl font-extrabold">Cancel / Refund</div>
+                  </div>
+                </div>
+              ) : isSelesai ? (
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-[40px] h-[40px] rounded-full bg-white/20 flex items-center justify-center text-[20px]">&#10003;</div>
+                  <div>
+                    <div className="text-[11px] opacity-85">Status order</div>
+                    <div className="text-xl font-extrabold">Selesai</div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="text-xs opacity-85">Status order saat ini</div>
+                  <div className="text-xl font-extrabold mt-1">{o.orderStatus}</div>
+                </>
+              )}
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mt-[18px]">
+                <div><div className="text-[10px] opacity-70">Total barang</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.totalAmount - (o.shipCost || 0))}</div></div>
+                <div><div className="text-[10px] opacity-70">Ongkir</div><div className="font-bold text-[14px] mt-[1px]">{o.shipCost ? rp(o.shipCost) : '-'}</div></div>
+                <div><div className="text-[10px] opacity-70">Sudah dibayar</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.paidAmount)}</div></div>
+                {isCancelled ? (
+                  <div><div className="text-[10px] opacity-70">Refund</div><div className="font-bold text-[14px] mt-[1px]">{refundTotal > 0 ? rp(refundTotal) : 'Belum diproses'}</div></div>
+                ) : (
+                  <div><div className="text-[10px] opacity-70">Sisa</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.remainingAmount)}</div></div>
+                )}
               </div>
+              {isCancelled && (
+                <div className="mt-3 bg-white/15 rounded-[10px] p-3 text-[12px] font-semibold">
+                  Order dibatalkan.{refundTotal > 0 ? ` Refund ${rp(refundTotal)} sedang diproses.` : ' Hubungi admin untuk info refund.'}
+                </div>
+              )}
             </div>
-          ) : (
-            <>
-              <div className="text-xs opacity-85">Status order saat ini</div>
-              <div className="text-xl font-extrabold mt-1">{o.orderStatus}</div>
-            </>
-          )}
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mt-[18px]">
-            <div><div className="text-[10px] opacity-70">Total barang</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.totalAmount - (o.shipCost || 0))}</div></div>
-            <div><div className="text-[10px] opacity-70">Ongkir</div><div className="font-bold text-[14px] mt-[1px]">{o.shipCost ? rp(o.shipCost) : '-'}</div></div>
-            <div><div className="text-[10px] opacity-70">Sudah dibayar</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.paidAmount)}</div></div>
-            <div><div className="text-[10px] opacity-70">Sisa</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.remainingAmount)}</div></div>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* timeline */}
         <div className="bg-white rounded-[18px] p-5 mt-3.5 shadow-[0_2px_14px_rgba(15,23,42,.05)]">
