@@ -74,11 +74,11 @@ export async function downloadInvoicePdf(o: Order, storeName: string, bankInfo: 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...gray);
-    if (meta) doc.text(`${meta} · Fee ${rp(it.jastipFee)}`, marginX, y + 12);
+    if (meta) doc.text(meta, marginX, y + 12);
     doc.setTextColor(15, 23, 42);
     doc.setFontSize(10);
     doc.text(String(it.qty), pageW - marginX - 200, y, { align: 'right' });
-    doc.text(rp(it.priceInIdr), pageW - marginX - 110, y, { align: 'right' });
+    doc.text(rp(it.priceInIdr + it.jastipFee), pageW - marginX - 110, y, { align: 'right' });
     doc.setFont('helvetica', 'bold');
     doc.text(rp(itemSubtotal(it)), pageW - marginX, y, { align: 'right' });
     y += meta ? 28 : 20;
