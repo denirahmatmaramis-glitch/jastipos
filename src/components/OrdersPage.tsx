@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { Order } from '@/lib/types';
 import { rp, payBadge, ordBadge } from '@/lib/utils';
+import { SearchIcon } from '@/lib/icons';
 
 interface Props {
   orders: Order[];
@@ -27,14 +29,27 @@ function produkStatus(o: Order): { label: string; bought: number; total: number;
 }
 
 export default function OrdersPage({ orders, filter, onFilter, onOpenOrder }: Props) {
-  const filtered = filter === 'Semua'
+  const [search, setSearch] = useState('');
+  const q = search.toLowerCase();
+
+  const byFilter = filter === 'Semua'
     ? orders
     : filter === 'Produk Belum Dibeli'
       ? orders.filter(o => o.items.some(it => it.purchaseStatus === 'Menunggu Pembelian'))
       : orders.filter(o => o.paymentStatus === filter || o.orderStatus === filter);
 
+  const filtered = q
+    ? byFilter.filter(o => o.customerName.toLowerCase().includes(q) || o.invoiceNo.toLowerCase().includes(q) || o.batchName.toLowerCase().includes(q))
+    : byFilter;
+
   return (
     <>
+      {/* Search */}
+      <div className="relative mb-3 md:mb-4">
+        <span className="absolute left-[13px] top-1/2 -translate-y-1/2"><SearchIcon /></span>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari nama customer, invoice, atau batch..." className="w-full py-[10px] pr-3.5 pl-[38px] border border-[#e2e8f0] rounded-[11px] text-[13px] outline-none bg-white" />
+      </div>
+
       {/* ===== MOBILE ===== */}
       <div className="md:hidden">
         {/* Filter chips — scrollable with icons */}
