@@ -46,8 +46,8 @@ export default function TrackPage({ order: o, batches, authed, storeName, onBack
         </div>
 
         {/* status card */}
-        {isSelesai ? (
-          <div className="rounded-[18px] p-[22px] text-white shadow-[0_16px_36px_rgba(22,163,106,.3)]" style={{ background: 'linear-gradient(135deg, #059669, #16a34a)' }}>
+        <div className="rounded-[18px] p-[22px] text-white" style={{ background: isSelesai ? 'linear-gradient(135deg, #059669, #16a34a)' : 'linear-gradient(135deg, #4f46e5, #6366f1)', boxShadow: isSelesai ? '0 16px 36px rgba(22,163,106,.3)' : '0 16px 36px rgba(79,70,229,.35)' }}>
+          {isSelesai ? (
             <div className="flex items-center gap-3 mb-3">
               <div className="w-[40px] h-[40px] rounded-full bg-white/20 flex items-center justify-center text-[20px]">&#10003;</div>
               <div>
@@ -55,20 +55,19 @@ export default function TrackPage({ order: o, batches, authed, storeName, onBack
                 <div className="text-xl font-extrabold">Selesai</div>
               </div>
             </div>
-            <div className="bg-white/15 rounded-[12px] p-3 text-[13px] font-semibold">Pesanan sudah diterima customer</div>
+          ) : (
+            <>
+              <div className="text-xs opacity-85">Status order saat ini</div>
+              <div className="text-xl font-extrabold mt-1">{o.orderStatus}</div>
+            </>
+          )}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mt-[18px]">
+            <div><div className="text-[10px] opacity-70">Total barang</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.totalAmount - (o.shipCost || 0))}</div></div>
+            <div><div className="text-[10px] opacity-70">Ongkir</div><div className="font-bold text-[14px] mt-[1px]">{o.shipCost ? rp(o.shipCost) : '-'}</div></div>
+            <div><div className="text-[10px] opacity-70">Sudah dibayar</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.paidAmount)}</div></div>
+            <div><div className="text-[10px] opacity-70">Sisa</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.remainingAmount)}</div></div>
           </div>
-        ) : (
-          <div className="rounded-[18px] p-[22px] text-white shadow-[0_16px_36px_rgba(79,70,229,.35)]" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)' }}>
-            <div className="text-xs opacity-85">Status order saat ini</div>
-            <div className="text-xl font-extrabold mt-1">{o.orderStatus}</div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mt-[18px]">
-              <div><div className="text-[10px] opacity-70">Total barang</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.totalAmount - (o.shipCost || 0))}</div></div>
-              <div><div className="text-[10px] opacity-70">Ongkir</div><div className="font-bold text-[14px] mt-[1px]">{o.shipCost ? rp(o.shipCost) : '-'}</div></div>
-              <div><div className="text-[10px] opacity-70">Sudah dibayar</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.paidAmount)}</div></div>
-              <div><div className="text-[10px] opacity-70">Sisa</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.remainingAmount)}</div></div>
-            </div>
-          </div>
-        )}
+        </div>
 
         {/* timeline */}
         <div className="bg-white rounded-[18px] p-5 mt-3.5 shadow-[0_2px_14px_rgba(15,23,42,.05)]">
@@ -118,7 +117,6 @@ export default function TrackPage({ order: o, batches, authed, storeName, onBack
             <div className="grid grid-cols-[auto_1fr] gap-x-3.5 gap-y-1.5 text-[13px]">
               {o.courier && <><span className="text-[#059669]">Kurir</span><span className="font-bold text-right text-[#065f46]">{o.courier}</span></>}
               {o.resi && <><span className="text-[#059669]">No. Resi</span><span className="font-bold text-right text-[#065f46] font-mono">{o.resi}</span></>}
-              {o.shipDate && <><span className="text-[#059669]">Estimasi tiba</span><span className="font-bold text-right text-[#065f46]">{estimateArrival(o.shipDate)}</span></>}
             </div>
           </div>
         )}
