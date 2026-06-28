@@ -245,7 +245,7 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
                 <div><label className={lblSmCls}>Jumlah Bayar</label><NumInput value={+(payForm.amount) || 0} onChange={v => onPayFormChange('amount', String(v))} className={inpSmCls} /></div>
                 <div className="flex gap-2.5">
                   <div className="flex-1"><label className={lblSmCls}>Metode</label><select value={payForm.method} onChange={e => onPayFormChange('method', e.target.value)} className={inpSmCls}><option>Transfer</option><option>QRIS</option><option>Cash</option></select></div>
-                  <div className="flex-1"><label className={lblSmCls}>Jenis</label><select value={payForm.type} onChange={e => onPayFormChange('type', e.target.value)} className={inpSmCls}><option>DP</option><option>Pelunasan</option><option>Tambahan Ongkir</option><option>Refund</option></select></div>
+                  <div className="flex-1"><label className={lblSmCls}>Jenis</label><select value={payForm.type} onChange={e => onPayFormChange('type', e.target.value)} className={inpSmCls}><option>DP</option><option>Pelunasan</option><option>Ongkir</option><option>Refund</option></select></div>
                 </div>
                 <button onClick={onAddPayment} className="py-[11px] border-none rounded-[10px] bg-[#16a34a] text-white text-[13px] font-bold cursor-pointer hover:bg-[#15803d] transition-colors">+ Catat Pembayaran</button>
               </div>
