@@ -100,6 +100,8 @@ export async function downloadInvoicePdf(o: Order, storeName: string, bankInfo: 
     doc.text(value, pageW - marginX, y, { align: 'right' });
     y += 18;
   };
+  totalRow('Subtotal Barang', rp(o.totalAmount - (o.shipCost || 0)), [15, 23, 42]);
+  if (o.shipCost) totalRow('Ongkir', rp(o.shipCost), [15, 23, 42]);
   totalRow('Total Order', rp(o.totalAmount), [15, 23, 42], true);
   totalRow('Sudah Dibayar', rp(o.paidAmount), [22, 163, 74]);
   totalRow('Sisa Pelunasan', rp(o.remainingAmount), [217, 119, 6]);
