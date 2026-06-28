@@ -61,10 +61,11 @@ export default function TrackPage({ order: o, batches, authed, storeName, onBack
           <div className="rounded-[18px] p-[22px] text-white shadow-[0_16px_36px_rgba(79,70,229,.35)]" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)' }}>
             <div className="text-xs opacity-85">Status order saat ini</div>
             <div className="text-xl font-extrabold mt-1">{o.orderStatus}</div>
-            <div className="flex gap-[18px] mt-[18px]">
-              <div><div className="text-[11px] opacity-80">Total order</div><div className="font-bold text-[15px] mt-[2px]">{rp(o.totalAmount)}</div></div>
-              <div><div className="text-[11px] opacity-80">Sudah dibayar</div><div className="font-bold text-[15px] mt-[2px]">{rp(o.paidAmount)}</div></div>
-              <div><div className="text-[11px] opacity-80">Sisa</div><div className="font-bold text-[15px] mt-[2px]">{rp(o.remainingAmount)}</div></div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mt-[18px]">
+              <div><div className="text-[10px] opacity-70">Total barang</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.totalAmount - (o.shipCost || 0))}</div></div>
+              <div><div className="text-[10px] opacity-70">Ongkir</div><div className="font-bold text-[14px] mt-[1px]">{o.shipCost ? rp(o.shipCost) : '-'}</div></div>
+              <div><div className="text-[10px] opacity-70">Sudah dibayar</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.paidAmount)}</div></div>
+              <div><div className="text-[10px] opacity-70">Sisa</div><div className="font-bold text-[14px] mt-[1px]">{rp(o.remainingAmount)}</div></div>
             </div>
           </div>
         )}
