@@ -59,6 +59,7 @@ export default function JastipApp() {
   const [userEmail, setUserEmail] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+  const [routeHistory, setRouteHistory] = useState<Route[]>([]);
   const [appLoading, setAppLoading] = useState(true);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -187,6 +188,7 @@ export default function JastipApp() {
 
   const nav = useCallback((r: Route) => {
     setState(s => {
+      setRouteHistory(h => [...h.slice(-10), s.route]);
       if (r === 'create' && s.plan === 'free' && s.orders.length >= FREE_ORDER_LIMIT) {
         return { ...s, route: 'upgrade' as Route };
       }
@@ -194,8 +196,19 @@ export default function JastipApp() {
     });
   }, []);
 
+  const goBack = useCallback(() => {
+    setRouteHistory(h => {
+      const prev = h[h.length - 1] || 'dashboard';
+      setState(s => ({ ...s, route: prev }));
+      return h.slice(0, -1);
+    });
+  }, []);
+
   const openOrder = useCallback((id: string) => {
-    setState(s => ({ ...s, selectedOrderId: id, route: 'detail' as Route, detailTab: 'produk' as DetailTab }));
+    setState(s => {
+      setRouteHistory(h => [...h.slice(-10), s.route]);
+      return { ...s, selectedOrderId: id, route: 'detail' as Route, detailTab: 'produk' as DetailTab };
+    });
   }, []);
 
   // ========== RENDER ==========
@@ -242,9 +255,16 @@ export default function JastipApp() {
 
       <main className="jp-scroll flex-1 min-w-0 p-[26px_30px] max-md:p-[14px_14px_80px] max-h-screen overflow-y-auto">
         <div className="flex items-start justify-between gap-3 mb-4 md:mb-[22px] flex-wrap">
-          <div>
-            <h1 className="m-0 text-[19px] md:text-[23px] font-extrabold tracking-tight">{pageTitle}</h1>
-            <p className="mt-0.5 md:mt-1 mb-0 text-[#64748b] text-[12px] md:text-[13px] hidden md:block">{pageSubtitle}</p>
+          <div className="flex items-center gap-2">
+            {state.route !== 'dashboard' && (
+              <button onClick={goBack} className="md:hidden w-[32px] h-[32px] rounded-[9px] border border-[#e2e8f0] bg-white flex items-center justify-center cursor-pointer shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            )}
+            <div>
+              <h1 className="m-0 text-[19px] md:text-[23px] font-extrabold tracking-tight">{pageTitle}</h1>
+              <p className="mt-0.5 md:mt-1 mb-0 text-[#64748b] text-[12px] md:text-[13px] hidden md:block">{pageSubtitle}</p>
+            </div>
           </div>
           <button onClick={() => nav('create')} className="flex items-center gap-[7px] py-[11px] px-4 border-none rounded-[11px] bg-[#4f46e5] text-white text-[13.5px] font-bold cursor-pointer whitespace-nowrap hover:bg-[#4338ca] transition-colors">
             <PlusIcon />Buat Order
