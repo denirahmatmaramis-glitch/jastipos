@@ -36,29 +36,45 @@ export default function BatchesPage({ batches, orders, onAddBatch, onToast }: Pr
 
   return (
     <>
-      <div className="flex justify-end mb-4">
-        <button onClick={() => setShowAdd(true)} className="py-[11px] px-4 border-none rounded-[11px] bg-[#4f46e5] text-white text-[13.5px] font-bold cursor-pointer hover:bg-[#4338ca] transition-colors">+ Buat Batch</button>
+      <div className="flex justify-end mb-3 md:mb-4">
+        <button onClick={() => setShowAdd(true)} className="w-full md:w-auto py-[11px] px-4 border-none rounded-[11px] bg-[#4f46e5] text-white text-[13.5px] font-bold cursor-pointer hover:bg-[#4338ca] transition-colors">+ Buat Batch</button>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-4">
+
+      {batches.length === 0 && (
+        <div className="bg-white border border-[#eef0f6] rounded-[14px] py-10 text-center">
+          <div className="text-[32px] mb-2">✈️</div>
+          <div className="text-[14px] font-bold text-[#475569]">Belum ada batch</div>
+          <div className="text-[12px] text-[#94a3b8] mt-1">Buat batch jastip pertama kamu</div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-3 md:gap-4">
         {batches.map(b => {
           const bo = orders.filter(o => o.batchId === b.id);
           const [bg, color] = batchBadge(b.status);
+          const omzet = bo.reduce((s, o) => s + o.totalAmount, 0);
           return (
-            <div key={b.id} className="bg-white border border-[#eef0f6] rounded-2xl p-5 hover:border-[#c7d2fe] transition-colors">
+            <div key={b.id} className="bg-white border border-[#eef0f6] rounded-[14px] md:rounded-2xl p-4 md:p-5 hover:border-[#c7d2fe] transition-colors">
               <div className="flex justify-between items-start gap-2.5">
-                <div className="text-[15px] font-extrabold tracking-tight leading-snug">{b.name}</div>
-                <span className="py-1 px-[9px] rounded-[7px] text-[11px] font-bold whitespace-nowrap" style={{ background: bg, color }}>{b.status}</span>
+                <div className="text-[14px] md:text-[15px] font-extrabold tracking-tight leading-snug">{b.name}</div>
+                <span className="py-1 px-[9px] rounded-[7px] text-[10.5px] md:text-[11px] font-bold whitespace-nowrap" style={{ background: bg, color }}>{b.status}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-[#64748b] text-[12.5px] mt-2">
+              <div className="flex items-center gap-1.5 text-[#64748b] text-[12px] md:text-[12.5px] mt-1.5">
                 <LocationIcon />{b.place}
               </div>
-              <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 mt-3.5 text-[12.5px]">
+              <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 mt-3 text-[12px] md:text-[12.5px]">
                 <span className="text-[#94a3b8]">Periode</span><span className="font-semibold text-right">{b.start ? `${dt(b.start)} – ${dt(b.end)}` : '-'}</span>
                 <span className="text-[#94a3b8]">Estimasi tiba</span><span className="font-semibold text-right">{dt(b.arrival)}</span>
               </div>
-              <div className="flex gap-2.5 mt-4 pt-3.5 border-t border-[#f1f5f9]">
-                <div className="flex-1"><div className="text-[11px] text-[#94a3b8]">Order</div><div className="text-base font-extrabold">{bo.length}</div></div>
-                <div className="flex-1"><div className="text-[11px] text-[#94a3b8]">Omzet</div><div className="text-base font-extrabold">{rp(bo.reduce((s, o) => s + o.totalAmount, 0))}</div></div>
+              <div className="flex gap-2.5 mt-3 pt-3 border-t border-[#f1f5f9]">
+                <div className="flex-1 bg-[#f8fafc] rounded-[10px] p-2.5 text-center">
+                  <div className="text-[16px] md:text-base font-extrabold">{bo.length}</div>
+                  <div className="text-[10px] md:text-[11px] text-[#94a3b8]">Order</div>
+                </div>
+                <div className="flex-1 bg-[#f8fafc] rounded-[10px] p-2.5 text-center">
+                  <div className="text-[14px] md:text-base font-extrabold text-[#4f46e5]">{rp(omzet)}</div>
+                  <div className="text-[10px] md:text-[11px] text-[#94a3b8]">Omzet</div>
+                </div>
               </div>
             </div>
           );
