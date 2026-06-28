@@ -28,50 +28,62 @@ export default function ReportsPage({ orders, batches, onToast }: Props) {
       {/* ===== MOBILE ===== */}
       <div className="md:hidden flex flex-col gap-3">
 
-        {/* Hero — glassmorphism */}
-        <div className="relative rounded-[18px] overflow-hidden" style={{ background: 'linear-gradient(135deg, #4338ca 0%, #6366f1 50%, #818cf8 100%)' }}>
-          <div className="absolute top-[-30px] right-[-30px] w-[110px] h-[110px] rounded-full" style={{ background: 'rgba(255,255,255,0.07)' }} />
-          <div className="absolute bottom-[-15px] left-[-15px] w-[70px] h-[70px] rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }} />
-          <div className="relative p-5 pb-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-white/60 text-[10px] font-semibold uppercase tracking-widest">Laporan Keuangan</div>
-              <button onClick={async () => { try { await exportReportExcel(O); onToast('Laporan Excel diunduh ✓'); } catch { onToast('Gagal membuat Excel'); } }} className="py-1.5 px-3 border border-white/25 rounded-[8px] bg-white/10 text-white text-[11px] font-bold cursor-pointer">Export Excel</button>
+        {/* Financial overview — dark card */}
+        <div className="rounded-[18px] p-4 pb-3" style={{ background: '#0f172a' }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-[28px] h-[28px] rounded-[8px] bg-[#1e293b] flex items-center justify-center">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"/><path d="M7 16l4-6 4 3 5-7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+              <span className="text-white/60 text-[11px] font-semibold uppercase tracking-wider">Laporan</span>
             </div>
-            <div className="text-white text-[28px] font-extrabold tracking-tight leading-none">{rp(omzet)}</div>
-            <div className="text-white/50 text-[11px] mt-1">{O.length} order · {lunas} lunas · {belumLunas} belum lunas</div>
-
-            <div className="grid grid-cols-2 gap-2.5 mt-4">
-              <div className="rounded-[11px] py-2.5 px-3" style={{ background: 'rgba(255,255,255,0.12)' }}>
-                <div className="text-white/55 text-[9.5px] font-semibold uppercase tracking-wide">Profit</div>
-                <div className="text-white text-[16px] font-extrabold mt-[2px]">{rp(profit)}</div>
-              </div>
-              <div className="rounded-[11px] py-2.5 px-3" style={{ background: 'rgba(255,255,255,0.12)' }}>
-                <div className="text-white/55 text-[9.5px] font-semibold uppercase tracking-wide">Dibayar</div>
-                <div className="text-white text-[16px] font-extrabold mt-[2px]">{rp(paid)}</div>
-              </div>
-            </div>
-
-            {piutang > 0 && (
-              <div className="mt-3 flex items-center gap-2 rounded-[9px] py-2 px-3" style={{ background: 'rgba(239,68,68,0.2)' }}>
-                <div className="w-2 h-2 rounded-full bg-[#fca5a5] animate-pulse-soft" />
-                <span className="text-[11px] text-[#fca5a5] font-semibold">Piutang {rp(piutang)}</span>
-              </div>
-            )}
+            <button onClick={async () => { try { await exportReportExcel(O); onToast('Laporan Excel diunduh ✓'); } catch { onToast('Gagal membuat Excel'); } }} className="py-1.5 px-3 border border-white/15 rounded-[8px] bg-white/5 text-white/70 text-[11px] font-bold cursor-pointer">Export</button>
           </div>
-        </div>
 
-        {/* Stat ring cards */}
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { label: 'Modal', value: rp(modal), color: '#475569' },
-            { label: 'Fee', value: rp(profit), color: '#16a34a' },
-            { label: 'Lunas', value: `${lunas}/${O.length}`, color: '#4f46e5' },
-          ].map((s, i) => (
-            <div key={i} className="bg-white border border-[#eef0f6] rounded-[12px] py-3 px-2.5 text-center">
-              <div className="text-[15px] font-extrabold" style={{ color: s.color }}>{s.value}</div>
-              <div className="text-[10px] text-[#94a3b8] font-semibold mt-[2px]">{s.label}</div>
+          {/* Omzet */}
+          <div className="mb-4">
+            <div className="text-[#94a3b8] text-[10px] font-semibold uppercase tracking-wide">Total Omzet</div>
+            <div className="text-white text-[26px] font-extrabold tracking-tight mt-[2px]">{rp(omzet)}</div>
+          </div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-[10px] p-2.5" style={{ background: '#1e293b' }}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#16a34a]" />
+                <span className="text-[#64748b] text-[9.5px] font-semibold">Profit</span>
+              </div>
+              <div className="text-[#16a34a] text-[15px] font-extrabold">{rp(profit)}</div>
             </div>
-          ))}
+            <div className="rounded-[10px] p-2.5" style={{ background: '#1e293b' }}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
+                <span className="text-[#64748b] text-[9.5px] font-semibold">Dibayar</span>
+              </div>
+              <div className="text-[#60a5fa] text-[15px] font-extrabold">{rp(paid)}</div>
+            </div>
+            <div className="rounded-[10px] p-2.5" style={{ background: '#1e293b' }}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+                <span className="text-[#64748b] text-[9.5px] font-semibold">Modal</span>
+              </div>
+              <div className="text-[#fbbf24] text-[15px] font-extrabold">{rp(modal)}</div>
+            </div>
+            <div className="rounded-[10px] p-2.5" style={{ background: piutang > 0 ? '#1e293b' : '#132e1a' }}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: piutang > 0 ? '#ef4444' : '#16a34a' }} />
+                <span className="text-[#64748b] text-[9.5px] font-semibold">Piutang</span>
+              </div>
+              <div className="text-[15px] font-extrabold" style={{ color: piutang > 0 ? '#f87171' : '#4ade80' }}>{rp(piutang)}</div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/10 text-[11px]">
+            <span className="text-[#64748b]"><span className="text-white font-bold">{O.length}</span> order</span>
+            <span className="text-[#64748b]"><span className="text-[#4ade80] font-bold">{lunas}</span> lunas</span>
+            <span className="text-[#64748b]"><span className="text-[#fbbf24] font-bold">{belumLunas}</span> belum</span>
+          </div>
         </div>
 
         {/* Filter */}
