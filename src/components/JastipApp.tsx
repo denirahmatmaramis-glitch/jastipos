@@ -354,7 +354,12 @@ export default function JastipApp() {
             onRemoveItem={idx => setState(s => ({ ...s, draft: { ...s.draft, items: s.draft.items.filter((_, i) => i !== idx) } }))}
             onSave={() => {
               if (!state.draft.name || !state.draft.phone) { toast('Nama & No WhatsApp wajib diisi'); return; }
+              if (!state.draft.batchId) { toast('Batch jastip wajib dipilih'); return; }
               if (!state.draft.items.length) { toast('Minimal 1 produk'); return; }
+              const emptyProduct = state.draft.items.find(it => !it.productName.trim());
+              if (emptyProduct) { toast('Nama produk wajib diisi semua'); return; }
+              const zeroPrice = state.draft.items.find(it => it.priceInIdr <= 0);
+              if (zeroPrice) { toast('Harga produk wajib diisi (tidak boleh 0)'); return; }
               if (state.plan === 'free' && state.orders.length >= FREE_ORDER_LIMIT) { nav('upgrade'); return; }
 
               const batchName = state.batches.find(b => b.id === state.draft.batchId)?.name || '';

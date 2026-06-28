@@ -140,11 +140,18 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
               <div><label className={lblCls}>Instagram</label><input value={d.instagram} onChange={e => onDraftField('instagram', e.target.value)} placeholder="@user" className={inpCls} /></div>
             </div>
             <div className="md:col-span-full">
-              <label className={lblCls}>Batch Jastip</label>
-              <select value={d.batchId} onChange={e => onDraftField('batchId', e.target.value)} className={inpCls}>
-                <option value="">— Pilih batch —</option>
-                {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
+              <label className={lblCls}>Batch Jastip <span className="text-[#ef4444]">*</span></label>
+              {batches.length > 0 ? (
+                <select value={d.batchId} onChange={e => onDraftField('batchId', e.target.value)} className={inpCls} style={{ borderColor: !d.batchId ? '#fca5a5' : undefined }}>
+                  <option value="">— Pilih batch —</option>
+                  {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              ) : (
+                <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[11px] p-3 text-[12px] text-[#92400e]">
+                  Belum ada batch. <button onClick={() => onToast('Buat batch dulu di menu Batch Jastip')} className="bg-transparent border-none text-[#4f46e5] font-bold cursor-pointer p-0 underline">Buat batch jastip</button> terlebih dahulu.
+                </div>
+              )}
+              {!d.batchId && batches.length > 0 && <p className="m-0 mt-1 text-[10px] text-[#ef4444]">Wajib pilih batch jastip</p>}
             </div>
             {matchedCustomer && !nameMismatch && (
               <div className="md:col-span-full bg-[#ecfdf5] border border-[#a7f3d0] rounded-[11px] p-3 text-[12px] text-[#047857]">
@@ -200,13 +207,13 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
                     <button onClick={() => onRemoveItem(idx)} className="bg-transparent border-none text-[#ef4444] text-[11px] font-semibold cursor-pointer">Hapus</button>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(130px,1fr))] gap-2 md:gap-[11px]">
-                    <div className="col-span-2 md:col-span-full"><label className={lblSmCls}>Nama Produk</label><input value={it.productName} onChange={e => onItemField(idx, 'productName', e.target.value)} className={inpSmCls} /></div>
+                    <div className="col-span-2 md:col-span-full"><label className={lblSmCls}>Nama Produk <span className="text-[#ef4444]">*</span></label><input value={it.productName} onChange={e => onItemField(idx, 'productName', e.target.value)} className={inpSmCls} style={{ borderColor: !it.productName.trim() ? '#fca5a5' : undefined }} /></div>
                     <div><label className={lblSmCls}>Brand</label><input value={it.brandStore} onChange={e => onItemField(idx, 'brandStore', e.target.value)} className={inpSmCls} /></div>
                     <div className="hidden md:block"><label className={lblSmCls}>Link Produk</label><input value={it.productLink} onChange={e => onItemField(idx, 'productLink', e.target.value)} placeholder="https://" className={inpSmCls} /></div>
                     <div><label className={lblSmCls}>Warna</label><input value={it.color} onChange={e => onItemField(idx, 'color', e.target.value)} className={inpSmCls} /></div>
                     <div><label className={lblSmCls}>Size</label><input value={it.size} onChange={e => onItemField(idx, 'size', e.target.value)} className={inpSmCls} /></div>
                     <div><label className={lblSmCls}>Qty</label><NumInput value={it.qty} onChange={v => onItemField(idx, 'qty', v)} className={inpSmCls} /></div>
-                    <div><label className={lblSmCls}>Harga (Rp)</label><NumInput value={it.priceInIdr} onChange={v => onItemField(idx, 'priceInIdr', v)} className={inpSmCls} /></div>
+                    <div><label className={lblSmCls}>Harga (Rp) <span className="text-[#ef4444]">*</span></label><NumInput value={it.priceInIdr} onChange={v => onItemField(idx, 'priceInIdr', v)} className={inpSmCls} /></div>
                     <div><label className={lblSmCls}>Fee Jastip</label><NumInput value={it.jastipFee} onChange={v => onItemField(idx, 'jastipFee', v)} className={inpSmCls} /></div>
                     <div><label className={lblSmCls}>Biaya Lain</label><NumInput value={it.otherFee} onChange={v => onItemField(idx, 'otherFee', v)} className={inpSmCls} /></div>
                   </div>
@@ -238,7 +245,7 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
           <div className="h-px bg-[#eef0f7] my-3" />
 
           {/* Metode pembayaran */}
-          <label className="block text-[11px] md:text-xs font-semibold text-[#475569] mb-1.5">Metode Pembayaran</label>
+          <label className="block text-[11px] md:text-xs font-semibold text-[#475569] mb-1.5">Metode Pembayaran <span className="text-[#ef4444]">*</span></label>
           <div className="flex gap-2 mb-2.5">
             <button onClick={() => { onDraftField('dpPercent', 50); onDraftField('paymentStatus', 'Menunggu DP'); onDraftField('orderStatus', 'Menunggu DP'); }} className="flex-1 py-2 rounded-[9px] text-[11.5px] md:text-[12px] font-bold cursor-pointer" style={{ border: `1.5px solid ${d.dpPercent < 100 ? '#4f46e5' : '#e2e8f0'}`, background: d.dpPercent < 100 ? '#f5f3ff' : '#fff', color: d.dpPercent < 100 ? '#4f46e5' : '#475569' }}>Pakai DP</button>
             <button onClick={() => { onDraftField('dpPercent', 100); onDraftField('paymentStatus', 'Menunggu Pelunasan'); onDraftField('orderStatus', 'Menunggu Pelunasan'); }} className="flex-1 py-2 rounded-[9px] text-[11.5px] md:text-[12px] font-bold cursor-pointer" style={{ border: `1.5px solid ${d.dpPercent >= 100 ? '#4f46e5' : '#e2e8f0'}`, background: d.dpPercent >= 100 ? '#f5f3ff' : '#fff', color: d.dpPercent >= 100 ? '#4f46e5' : '#475569' }}>Bayar Lunas</button>
