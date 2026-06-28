@@ -319,7 +319,7 @@ export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payF
                 const meta = [it.brandStore, it.color !== '-' ? it.color : null, it.size !== '-' ? it.size : null].filter(Boolean).join(' · ');
                 return (
                   <div key={i} className="flex justify-between gap-2.5 py-[9px] border-b border-[#f1f5f9]">
-                    <div><div className="text-[13px] font-semibold">{it.productName}</div><div className="text-[11px] text-[#94a3b8]">{meta} · Fee {rp(it.jastipFee)}</div></div>
+                    <div><div className="text-[13px] font-semibold">{it.productName}</div><div className="text-[11px] text-[#94a3b8]">{meta}</div></div>
                     <div className="text-[13px] font-bold whitespace-nowrap">{rp(itemSubtotal(it))}</div>
                   </div>
                 );

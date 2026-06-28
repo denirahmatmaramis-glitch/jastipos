@@ -130,7 +130,7 @@ export function autoOrderStatus(order: Order): { orderStatus: string; paymentSta
 
 export function buildInvoiceText(o: Order, storeName: string, bankInfo: string): string {
   const lines = o.items.map((it, i) =>
-    `${i + 1}. ${it.productName} ${it.color !== '-' ? it.color : ''} ${it.size !== '-' ? it.size : ''}\n   Qty: ${it.qty}\n   Harga: ${rp(it.priceInIdr)}\n   Fee Jastip: ${rp(it.jastipFee)}`
+    `${i + 1}. ${it.productName} ${it.color !== '-' ? it.color : ''} ${it.size !== '-' ? it.size : ''}\n   Qty: ${it.qty}\n   Harga: ${rp(it.priceInIdr + it.jastipFee)} /pcs`
   ).join('\n');
   const subtotal = o.totalAmount - (o.shipCost || 0);
   const ongkirLine = o.shipCost ? `\nOngkir: ${rp(o.shipCost)}` : '';
