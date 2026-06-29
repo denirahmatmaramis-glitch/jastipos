@@ -289,6 +289,10 @@ export default function JastipApp() {
               setState(s => ({ ...s, customers: s.customers.map(x => x.id === c.id ? c : x) }));
               persist(() => db.updateCustomer(c));
             }}
+            onDeleteCustomer={id => {
+              setState(s => ({ ...s, customers: s.customers.filter(x => x.id !== id) }));
+              persist(() => db.deleteCustomer(id));
+            }}
             onOpenOrder={openOrder}
             onToast={toast}
           />

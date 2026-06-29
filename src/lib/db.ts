@@ -78,6 +78,11 @@ export async function updateCustomer(c: Customer) {
   if (error) throw error;
 }
 
+export async function deleteCustomer(id: string) {
+  const { error } = await supabase.from('customers').delete().eq('id', id);
+  if (error) throw error;
+}
+
 // ===== Batches =====
 
 function rowToBatch(r: Record<string, unknown>): Batch {

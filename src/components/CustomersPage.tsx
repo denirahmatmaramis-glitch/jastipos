@@ -13,6 +13,7 @@ interface Props {
   onSearch: (v: string) => void;
   onAddCustomer: (c: Customer) => void;
   onUpdateCustomer: (c: Customer) => void;
+  onDeleteCustomer: (id: string) => void;
   onOpenOrder: (id: string) => void;
   onToast: (m: string) => void;
 }
@@ -23,7 +24,7 @@ const inpCls = "w-full py-2.5 px-3 border border-[#e2e8f0] rounded-[10px] text-[
 
 const emptyForm = { name: '', phone: '', address: '', instagram: '' };
 
-export default function CustomersPage({ customers, orders, search, onSearch, onAddCustomer, onUpdateCustomer, onOpenOrder, onToast }: Props) {
+export default function CustomersPage({ customers, orders, search, onSearch, onAddCustomer, onUpdateCustomer, onDeleteCustomer, onOpenOrder, onToast }: Props) {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [detail, setDetail] = useState<Customer | null>(null);
@@ -184,8 +185,9 @@ export default function CustomersPage({ customers, orders, search, onSearch, onA
                 <span className="text-[#94a3b8]">Sisa piutang</span><span className="font-semibold text-right text-[#d97706]">{rp(totalSpent - totalPaid)}</span>
               </div>
               <div className="flex gap-2 mb-4">
-                <button onClick={() => window.open(waLink(detail.phone, `Halo Kak ${detail.name}`), '_blank')} className="flex-1 py-2.5 border-none rounded-[10px] bg-[#16a34a] text-white text-[13px] font-bold cursor-pointer hover:bg-[#15803d] transition-colors">Chat via WhatsApp</button>
-                <button onClick={startEdit} className="flex-1 py-2.5 border border-[#e2e8f0] rounded-[10px] bg-white text-[#4f46e5] text-[13px] font-bold cursor-pointer hover:border-[#c7d2fe] hover:bg-[#f5f3ff] transition-colors">Edit Data</button>
+                <button onClick={() => window.open(waLink(detail.phone, `Halo Kak ${detail.name}`), '_blank')} className="flex-1 py-2.5 border-none rounded-[10px] bg-[#16a34a] text-white text-[13px] font-bold cursor-pointer hover:bg-[#15803d] transition-colors">Chat WA</button>
+                <button onClick={startEdit} className="flex-1 py-2.5 border border-[#e2e8f0] rounded-[10px] bg-white text-[#4f46e5] text-[13px] font-bold cursor-pointer hover:border-[#c7d2fe] hover:bg-[#f5f3ff] transition-colors">Edit</button>
+                <button onClick={() => { if (detailOrders.length > 0) { onToast('Tidak bisa hapus — customer masih punya order'); return; } onDeleteCustomer(detail.id); setDetail(null); onToast('Customer dihapus ✓'); }} className="py-2.5 px-3 border border-[#fecaca] rounded-[10px] bg-white text-[#ef4444] text-[13px] font-bold cursor-pointer hover:bg-[#fef2f2] transition-colors">Hapus</button>
               </div>
             </>
           ) : (
