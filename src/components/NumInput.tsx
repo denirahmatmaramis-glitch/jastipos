@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface Props {
   value: number;
@@ -20,13 +20,18 @@ function parseNum(s: string): number {
 
 export default function NumInput({ value, onChange, className, placeholder }: Props) {
   const [display, setDisplay] = useState(() => formatNum(value));
+  const [lastValue, setLastValue] = useState(value);
 
-  useEffect(() => {
+  // Sinkronisasi saat prop value berubah dari luar (mis. AI auto-fill, hitung fee).
+  // Pola "adjust state during render" — pengganti useEffect yang direkomendasikan React.
+  if (value !== lastValue && value !== parseNum(display)) {
+    setLastValue(value);
     setDisplay(formatNum(value));
-  }, [value]);
+  }
 
   const handleChange = (raw: string) => {
     const num = parseNum(raw);
+    setLastValue(num);
     setDisplay(formatNum(num));
     onChange(num);
   };

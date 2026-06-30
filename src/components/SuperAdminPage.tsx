@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 
 interface AdminUser {
@@ -26,7 +26,7 @@ export default function SuperAdminPage({ onToast }: Props) {
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -40,9 +40,11 @@ export default function SuperAdminPage({ onToast }: Props) {
       onToast('Gagal memuat data admin');
     }
     setLoading(false);
-  };
+  }, [onToast]);
 
-  useEffect(() => { fetchUsers(); }, []);
+  // fetchUsers async — setState terjadi setelah await (bukan sinkron), aman.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
   const doAction = async (userId: string, action: 'activate' | 'deactivate') => {
     setActing(userId);

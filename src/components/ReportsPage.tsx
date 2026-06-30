@@ -1,7 +1,7 @@
 'use client';
 
 import { Order, Batch } from '@/lib/types';
-import { rp, payBadge, ordBadge } from '@/lib/utils';
+import { rp, payBadge } from '@/lib/utils';
 import { exportReportExcel } from '@/lib/export';
 
 interface Props {
@@ -106,7 +106,6 @@ export default function ReportsPage({ orders, batches, onToast }: Props) {
           <div className="flex flex-col gap-2.5">
             {O.map(o => {
               const [pBg, pC] = payBadge(o.paymentStatus);
-              const [oBg, oC] = ordBadge(o.orderStatus);
               return (
                 <div key={o.orderId} className="bg-white border border-[#eef0f6] rounded-[13px] overflow-hidden">
                   <div className="h-[3px]" style={{ background: o.paymentStatus === 'Lunas' ? '#16a34a' : o.remainingAmount > 0 ? '#f59e0b' : '#6366f1' }} />

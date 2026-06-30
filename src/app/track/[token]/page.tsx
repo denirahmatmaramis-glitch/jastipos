@@ -11,15 +11,12 @@ export default function TrackPageRoute() {
   const params = useParams();
   const token = params.token as string;
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!token && supabaseConfigured);
   const [storeName, setStoreName] = useState('Toko Jastip Kamu');
 
   useEffect(() => {
+    if (!token || !supabaseConfigured) return;
     let active = true;
-    if (!token || !supabaseConfigured) {
-      setLoading(false);
-      return;
-    }
     (async () => {
       try {
         const [o, name] = await Promise.all([

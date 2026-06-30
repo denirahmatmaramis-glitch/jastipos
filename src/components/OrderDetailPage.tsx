@@ -34,7 +34,7 @@ const inpCls = "w-full py-2.5 px-3 border border-[#e2e8f0] rounded-[10px] text-[
 const lblSmCls = "block text-[11.5px] font-semibold text-[#64748b] mb-1";
 const inpSmCls = "w-full py-2 px-2.5 border border-[#e2e8f0] rounded-[9px] text-[13px] outline-none bg-white";
 
-export default function OrderDetailPage({ order: o, batches, tab, onSetTab, payForm, onPayFormChange, onAddPayment, onOrderFieldChange, onShipFieldChange, onSaveShip, onOpenTrack, onAddItemToOrder, onRemoveItemFromOrder, onUpdateItemInOrder, onSaveOngkir, storeName, bankInfo, onToast }: Props) {
+export default function OrderDetailPage({ order: o, tab, onSetTab, payForm, onPayFormChange, onAddPayment, onOrderFieldChange, onShipFieldChange, onSaveShip, onOpenTrack, onAddItemToOrder, onRemoveItemFromOrder, onUpdateItemInOrder, onSaveOngkir, storeName, bankInfo, onToast }: Props) {
   const [addingItem, setAddingItem] = useState(false);
   const [newItem, setNewItem] = useState<OrderItem>(emptyItem());
   const [editIdx, setEditIdx] = useState<number | null>(null);

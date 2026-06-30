@@ -54,13 +54,13 @@ const emptyState: AppState = {
 };
 
 export default function JastipApp() {
-  const [state, setState] = useState<AppState>(emptyState);
+  const [state, setState] = useState<AppState>(supabaseConfigured ? emptyState : demoState);
   const [userId, setUserId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
-  const [routeHistory, setRouteHistory] = useState<Route[]>([]);
-  const [appLoading, setAppLoading] = useState(true);
+  const [, setRouteHistory] = useState<Route[]>([]);
+  const [appLoading, setAppLoading] = useState(supabaseConfigured);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toast = useCallback((m: string) => {
@@ -99,12 +99,8 @@ export default function JastipApp() {
 
   // Check existing session on mount
   useEffect(() => {
-    if (!supabaseConfigured) {
-      // Demo mode: use initial sample data, no Supabase
-      setState(demoState);
-      setAppLoading(false);
-      return;
-    }
+    // Demo mode (no Supabase): state already initialised with demoState.
+    if (!supabaseConfigured) return;
 
     (async () => {
       const session = await db.getSession();
@@ -439,7 +435,6 @@ export default function JastipApp() {
               toast('Order tersimpan & invoice dibuat ✓');
               setTimeout(() => nav('orders'), 700);
             }}
-            onPreviewLink={() => toast('Simpan order dulu untuk membuat link')}
             feeSummary={(() => {
               const b = state.batches.find(x => x.id === state.draft.batchId);
               const cfg = effectiveFeeConfig(b, state.globalFee);

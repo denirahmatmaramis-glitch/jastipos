@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Draft, Batch, OrderItem, Customer } from '@/lib/types';
+import { Draft, Batch, Customer } from '@/lib/types';
 import NumInput from './NumInput';
-import { rp, itemSubtotal, emptyItem, PAY_STATUSES, ORDER_STATUSES } from '@/lib/utils';
+import { rp, itemSubtotal } from '@/lib/utils';
 import { SparkleIcon } from '@/lib/icons';
 
 interface Props {
@@ -20,7 +20,6 @@ interface Props {
   onAddItem: () => void;
   onRemoveItem: (idx: number) => void;
   onSave: () => void;
-  onPreviewLink: () => void;
   feeSummary: string;
   onAutoFee: () => void;
   onToast: (m: string) => void;
@@ -30,9 +29,8 @@ const lblCls = "block text-xs font-semibold text-[#475569] mb-[5px]";
 const inpCls = "w-full py-2.5 px-3 border border-[#e2e8f0] rounded-[10px] text-[13.5px] outline-none bg-white";
 const lblSmCls = "block text-[11.5px] font-semibold text-[#64748b] mb-1";
 const inpSmCls = "w-full py-2 px-2.5 border border-[#e2e8f0] rounded-[9px] text-[13px] outline-none bg-white";
-const numFields = ['qty', 'priceInIdr', 'jastipFee', 'otherFee'];
 
-export default function CreateOrderPage({ draft, batches, customers, chatText, parsing, parsed, onChatInput, onParseChat, onDraftField, onItemField, onAddItem, onRemoveItem, onSave, onPreviewLink, feeSummary, onAutoFee, onToast }: Props) {
+export default function CreateOrderPage({ draft, batches, customers, chatText, parsing, parsed, onChatInput, onParseChat, onDraftField, onItemField, onAddItem, onRemoveItem, onSave, feeSummary, onAutoFee, onToast }: Props) {
   const d = draft;
   const [matchedCustomer, setMatchedCustomer] = useState<Customer | null>(null);
   const [nameMismatch, setNameMismatch] = useState(false);
@@ -84,6 +82,7 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
       checkPhoneMatch(d.phone, d.name);
     }
     prevParsed.current = parsed;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsed]);
 
   const tProduct = d.items.reduce((s, i) => s + i.priceInIdr * i.qty, 0);
