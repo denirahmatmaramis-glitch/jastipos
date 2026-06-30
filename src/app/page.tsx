@@ -74,7 +74,7 @@ const faqs = [
   },
   {
     q: 'Data saya aman?',
-    a: 'Data kamu tersimpan di server aman (Supabase/PostgreSQL) dengan enkripsi. Setiap akun punya data terisolasi — tidak ada akun lain yang bisa melihat data kamu.',
+    a: 'Data kamu tersimpan di server aman dengan enkripsi. Setiap akun punya data terisolasi — tidak ada akun lain yang bisa melihat data kamu.',
   },
   {
     q: 'Apakah perlu install aplikasi?',
@@ -82,11 +82,7 @@ const faqs = [
   },
   {
     q: 'Fitur AI parse chat itu gimana cara kerjanya?',
-    a: 'Kamu copy-paste chat order dari WhatsApp, lalu AI (Google Gemini) akan membaca dan mengisi form order otomatis — nama produk, harga, catatan, dll.',
-  },
-  {
-    q: 'Bisa dipakai untuk jastip dari negara mana saja?',
-    a: 'Bisa! JastipOS mendukung berbagai mata uang dan kurs yang bisa kamu atur sendiri.',
+    a: 'Kamu copy-paste chat order dari WhatsApp, lalu AI akan membaca dan mengisi form order otomatis — nama produk, harga, catatan, dll.',
   },
 ];
 
