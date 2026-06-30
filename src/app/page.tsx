@@ -94,49 +94,83 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white" style={{ fontFamily: 'var(--font-jakarta), system-ui, sans-serif' }}>
 
       {/* ─── NAVBAR ─── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #f1f5f9' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #f1f5f9' }}>
+        {/* Main bar */}
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 15 }}>J</div>
             <span style={{ fontWeight: 800, fontSize: 17, color: '#0f172a', letterSpacing: '-0.3px' }}>JastipOS</span>
           </div>
 
-          {/* Desktop nav */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 28 }} className="hidden-mobile">
+          {/* Desktop nav links */}
+          <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
             <a href="#fitur" style={{ fontSize: 14, color: '#475569', textDecoration: 'none', fontWeight: 500 }}>Fitur</a>
             <a href="#cara-kerja" style={{ fontSize: 14, color: '#475569', textDecoration: 'none', fontWeight: 500 }}>Cara Kerja</a>
             <a href="#harga" style={{ fontSize: 14, color: '#475569', textDecoration: 'none', fontWeight: 500 }}>Harga</a>
             <a href="#faq" style={{ fontSize: 14, color: '#475569', textDecoration: 'none', fontWeight: 500 }}>FAQ</a>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Link href="/app" style={{ fontSize: 13.5, color: '#475569', fontWeight: 600, textDecoration: 'none', padding: '7px 14px' }} className="hidden-mobile">
+          {/* Desktop right buttons */}
+          <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Link href="/app" style={{ fontSize: 13.5, color: '#475569', fontWeight: 600, textDecoration: 'none', padding: '7px 14px' }}>
               Masuk
             </Link>
             <Link href="/app" style={{ fontSize: 13.5, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', fontWeight: 700, textDecoration: 'none', padding: '8px 18px', borderRadius: 10 }}>
               Coba Gratis
             </Link>
-            {/* Mobile menu toggle */}
-            <button onClick={() => setMenuOpen(!menuOpen)} style={{ display: 'none', background: 'none', border: 'none', padding: 6, cursor: 'pointer', color: '#475569' }} className="show-mobile">
-              {menuOpen ? (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-              ) : (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-              )}
-            </button>
           </div>
+
+          {/* Mobile: hamburger only */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="nav-mobile"
+            style={{ background: menuOpen ? '#f1f5f9' : 'none', border: 'none', borderRadius: 8, width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#0f172a' }}
+          >
+            {menuOpen
+              ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            }
+          </button>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile dropdown menu */}
         {menuOpen && (
-          <div style={{ background: 'white', borderTop: '1px solid #f1f5f9', padding: '12px 20px 16px' }} className="show-mobile">
-            <a href="#fitur" onClick={() => setMenuOpen(false)} style={{ display: 'block', padding: '10px 0', color: '#374151', fontWeight: 500, textDecoration: 'none', fontSize: 15, borderBottom: '1px solid #f8fafc' }}>Fitur</a>
-            <a href="#cara-kerja" onClick={() => setMenuOpen(false)} style={{ display: 'block', padding: '10px 0', color: '#374151', fontWeight: 500, textDecoration: 'none', fontSize: 15, borderBottom: '1px solid #f8fafc' }}>Cara Kerja</a>
-            <a href="#harga" onClick={() => setMenuOpen(false)} style={{ display: 'block', padding: '10px 0', color: '#374151', fontWeight: 500, textDecoration: 'none', fontSize: 15, borderBottom: '1px solid #f8fafc' }}>Harga</a>
-            <a href="#faq" onClick={() => setMenuOpen(false)} style={{ display: 'block', padding: '10px 0', color: '#374151', fontWeight: 500, textDecoration: 'none', fontSize: 15 }}>FAQ</a>
-            <Link href="/app" style={{ display: 'block', marginTop: 12, textAlign: 'center', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', fontWeight: 700, textDecoration: 'none', padding: '12px', borderRadius: 12, fontSize: 15 }}>
-              Coba Gratis — Gratis!
-            </Link>
+          <div style={{ background: 'white', borderTop: '1px solid #f1f5f9', padding: '8px 16px 20px' }}>
+            {[
+              { href: '#fitur', label: 'Fitur', icon: '📦' },
+              { href: '#cara-kerja', label: 'Cara Kerja', icon: '🚀' },
+              { href: '#harga', label: 'Harga', icon: '💰' },
+              { href: '#faq', label: 'FAQ', icon: '❓' },
+            ].map(item => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+                style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 12px', color: '#1e293b', fontWeight: 600, textDecoration: 'none', fontSize: 15, borderRadius: 12, margin: '2px 0' }}
+              >
+                <span style={{ fontSize: 18, width: 28, textAlign: 'center' }}>{item.icon}</span>
+                {item.label}
+                <svg style={{ marginLeft: 'auto' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+              </a>
+            ))}
+
+            <div style={{ margin: '12px 0 0', padding: '12px 0 0', borderTop: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <Link
+                href="/app"
+                onClick={() => setMenuOpen(false)}
+                style={{ display: 'block', textAlign: 'center', border: '1.5px solid #e2e8f0', color: '#374151', fontWeight: 700, textDecoration: 'none', padding: '12px', borderRadius: 12, fontSize: 15 }}
+              >
+                Masuk
+              </Link>
+              <Link
+                href="/app"
+                onClick={() => setMenuOpen(false)}
+                style={{ display: 'block', textAlign: 'center', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', fontWeight: 700, textDecoration: 'none', padding: '13px', borderRadius: 12, fontSize: 15, boxShadow: '0 4px 14px rgba(99,102,241,0.3)' }}
+              >
+                Coba Gratis — Gratis!
+              </Link>
+            </div>
           </div>
         )}
       </nav>
@@ -431,11 +465,12 @@ export default function LandingPage() {
 
       <style>{`
         @media (max-width: 640px) {
-          .hidden-mobile { display: none !important; }
-          .show-mobile { display: flex !important; }
+          .nav-desktop { display: none !important; }
+          .nav-mobile { display: flex !important; }
         }
         @media (min-width: 641px) {
-          .show-mobile { display: none !important; }
+          .nav-desktop { display: flex !important; }
+          .nav-mobile { display: none !important; }
         }
       `}</style>
     </div>
