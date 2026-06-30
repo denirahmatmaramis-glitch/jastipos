@@ -1,7 +1,7 @@
 'use client';
 
 import { Order, Batch } from '@/lib/types';
-import { rp, dt, buildSteps, maskName, itemSubtotal } from '@/lib/utils';
+import { rp, dt, buildSteps, maskName } from '@/lib/utils';
 import { LogoIcon } from '@/lib/icons';
 
 interface Props {

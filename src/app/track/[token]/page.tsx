@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Order, Batch } from '@/lib/types';
+import { Order } from '@/lib/types';
 import { supabaseConfigured } from '@/lib/supabase';
 import * as db from '@/lib/db';
 import TrackPage from '@/components/TrackPage';
@@ -11,34 +11,30 @@ export default function TrackPageRoute() {
   const params = useParams();
   const token = params.token as string;
   const [order, setOrder] = useState<Order | null>(null);
-  const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [storeName, setStoreName] = useState('Toko Jastip Kamu');
 
   useEffect(() => {
+    let active = true;
     if (!token || !supabaseConfigured) {
       setLoading(false);
       return;
     }
-
     (async () => {
       try {
-        const o = await db.getOrderByToken(token);
-        if (o) {
-          setOrder(o);
-          const profile = await db.getProfile(
-            // We need the owner_id — get it from the order row directly
-            await getOwnerIdByToken(token)
-          );
-          if (profile) {
-            setStoreName(profile.store_name || 'Toko Jastip Kamu');
-          }
-        }
+        const [o, name] = await Promise.all([
+          db.getOrderByToken(token),
+          db.getStoreNameByToken(token),
+        ]);
+        if (!active) return;
+        if (o) setOrder(o);
+        if (name) setStoreName(name);
       } catch (e) {
         console.error('Track page error:', e);
       }
-      setLoading(false);
+      if (active) setLoading(false);
     })();
+    return () => { active = false; };
   }, [token]);
 
   if (loading) {
@@ -64,11 +60,5 @@ export default function TrackPageRoute() {
     );
   }
 
-  return <TrackPage order={order} batches={batches} authed={false} storeName={storeName} onBack={() => {}} />;
-}
-
-async function getOwnerIdByToken(token: string): Promise<string> {
-  const { supabase } = await import('@/lib/supabase');
-  const { data } = await supabase.from('orders').select('owner_id').eq('tracking_token', token).single();
-  return data?.owner_id || '';
+  return <TrackPage order={order} batches={[]} authed={false} storeName={storeName} onBack={() => {}} />;
 }

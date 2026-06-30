@@ -191,6 +191,12 @@ export async function getOrderByToken(token: string): Promise<Order | null> {
   return rowToOrder(row, (itemsRes.data || []).map(rowToItem), (paymentsRes.data || []).map(rowToPayment));
 }
 
+export async function getStoreNameByToken(token: string): Promise<string> {
+  const { data, error } = await supabase.rpc('get_store_name_by_token', { track_token: token });
+  if (error || !data) return 'Toko Jastip Kamu';
+  return data as string;
+}
+
 export async function insertOrder(ownerId: string, o: Order): Promise<Order> {
   const { data: row, error } = await supabase.from('orders').insert({
     owner_id: ownerId, invoice_no: o.invoiceNo, tracking_token: o.trackingToken,
