@@ -3,46 +3,65 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-const features = [
-  {
-    icon: '📦',
-    title: 'Manajemen Order Lengkap',
-    desc: 'Buat, edit, dan pantau semua order jastip dalam satu dashboard. Status otomatis terupdate sesuai progres.',
-  },
+const showcaseFeatures = [
   {
     icon: '💬',
     title: 'Parse Chat WhatsApp AI',
-    desc: 'Tempel chat WhatsApp customer, AI langsung parsing jadi form order. Hemat waktu input manual.',
+    desc: 'Tempel chat WhatsApp customer, AI langsung baca dan isi form order otomatis — nama, alamat, produk, harga. Tidak perlu ketik manual satu-satu.',
+    points: ['Hemat waktu input order hingga 80%', 'AI paham format chat natural bahasa Indonesia', 'Bisa diedit manual kalau ada yang kurang pas'],
+    image: '/screenshots/create-order.png',
+    reverse: false,
   },
   {
-    icon: '🔗',
-    title: 'Link Tracking Customer',
-    desc: 'Kirim link unik ke customer agar mereka bisa cek status ordernya sendiri. Kurangi pertanyaan "udah sampai mana?"',
+    icon: '📦',
+    title: 'Manajemen Order Lengkap',
+    desc: 'Semua order jastip kamu dalam satu dashboard rapi. Cari, filter, dan pantau status pembayaran maupun pembelian secara real-time.',
+    points: ['Filter status: DP, Pelunasan, Sudah Dibeli, dll', 'Pencarian cepat by nama, invoice, atau batch', 'Status order & pembayaran otomatis update'],
+    image: '/screenshots/orders.png',
+    reverse: true,
   },
   {
     icon: '🧾',
     title: 'Invoice PDF Otomatis',
-    desc: 'Generate invoice profesional dengan satu klik. Langsung bisa dikirim ke customer via WhatsApp.',
+    desc: 'Invoice profesional dibuat otomatis dari data order — lengkap dengan rincian produk, subtotal, dan info rekening. Tinggal kirim ke customer.',
+    points: ['Download PDF sekali klik', 'Kirim langsung lewat WhatsApp', 'Format rapi & terlihat profesional'],
+    image: '/screenshots/order-invoice.png',
+    reverse: false,
   },
+  {
+    icon: '🔗',
+    title: 'Link Tracking Customer',
+    desc: 'Setiap order dapat link unik yang bisa dibuka customer tanpa login. Mereka bisa cek status order sendiri, kapan saja.',
+    points: ['Tidak perlu login — cukup buka link', 'Kurangi chat "udah sampai mana kak?"', 'Bisa dikirim otomatis lewat WhatsApp'],
+    image: '/screenshots/order-link.png',
+    reverse: true,
+  },
+];
+
+const gridFeatures = [
   {
     icon: '💰',
     title: 'Laporan Keuangan',
-    desc: 'Pantau profit, modal, piutang, dan total penjualan. Laporan otomatis berdasarkan semua transaksi.',
+    desc: 'Pantau omzet, modal, profit, dan piutang otomatis dari semua transaksi — tanpa hitung manual.',
+    image: '/screenshots/reports.png',
   },
   {
     icon: '👥',
     title: 'Database Customer',
-    desc: 'Simpan data customer, nomor HP, dan history order. Auto-fill form saat customer repeat order.',
+    desc: 'Data customer & history order tersimpan rapi. Auto-fill otomatis saat customer lama repeat order.',
+    image: '/screenshots/customers.png',
   },
   {
     icon: '⚙️',
     title: 'Setting Fee Jastip',
-    desc: 'Atur persentase fee per tier harga, minimum fee, dan kurs mata uang yang fleksibel.',
+    desc: 'Atur skema fee — flat, persen, atau tier harga — sekali setting, berlaku otomatis ke semua order baru.',
+    image: '/screenshots/fees.png',
   },
   {
     icon: '🔒',
     title: 'Data Aman & Terisolasi',
-    desc: 'Setiap akun punya data terpisah. Tidak ada jastiper lain yang bisa akses data kamu.',
+    desc: 'Setiap akun punya data terpisah sepenuhnya. Tidak ada jastiper lain yang bisa mengakses data kamu.',
+    image: null,
   },
 ];
 
@@ -252,29 +271,99 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── FEATURES ─── */}
-      <section id="fitur" style={{ padding: '80px 20px', background: 'white' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
+      {/* ─── FEATURES SHOWCASE ─── */}
+      <section id="fitur" style={{ padding: '80px 20px 40px', background: 'white' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
             <div style={{ display: 'inline-block', background: '#eef2ff', color: '#4f46e5', fontSize: 12, fontWeight: 700, padding: '5px 14px', borderRadius: 100, marginBottom: 14, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
               Fitur Lengkap
             </div>
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>
-              Semua yang kamu butuhkan
+              Lihat langsung cara kerjanya
             </h2>
             <p style={{ color: '#64748b', fontSize: 15, maxWidth: 480, margin: '0 auto' }}>
-              Dari input order sampai laporan keuangan — semuanya terintegrasi dan otomatis.
+              Bukan cuma janji fitur — ini tampilan asli aplikasinya.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
-            {features.map((f) => (
-              <div key={f.title} style={{ background: '#fafbff', border: '1px solid #e8ecf5', borderRadius: 16, padding: '22px 20px', transition: 'box-shadow 0.15s' }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg,#eef2ff,#f5f3ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>
-                  {f.icon}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 88 }}>
+            {showcaseFeatures.map((f) => (
+              <div
+                key={f.title}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: 48,
+                  alignItems: 'center',
+                }}
+                className={f.reverse ? 'showcase-row showcase-reverse' : 'showcase-row'}
+              >
+                <div className={f.reverse ? 'showcase-text order-2' : 'showcase-text'}>
+                  <div style={{ width: 48, height: 48, borderRadius: 13, background: 'linear-gradient(135deg,#eef2ff,#f5f3ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 18 }}>
+                    {f.icon}
+                  </div>
+                  <h3 style={{ fontSize: 'clamp(19px, 3vw, 24px)', fontWeight: 800, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px' }}>
+                    {f.title}
+                  </h3>
+                  <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.7, marginBottom: 18 }}>
+                    {f.desc}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+                    {f.points.map(p => (
+                      <div key={p} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, fontSize: 13, color: '#374151', fontWeight: 500 }}>
+                        <svg style={{ flexShrink: 0, marginTop: 2 }} width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#e0e7ff"/><path d="M8 12l3 3 5-5" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        {p}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div style={{ fontWeight: 700, fontSize: 14.5, color: '#1e293b', marginBottom: 6 }}>{f.title}</div>
-                <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>{f.desc}</div>
+
+                <div className={f.reverse ? 'showcase-image order-1' : 'showcase-image'}>
+                  <div style={{
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    background: '#0f172a',
+                    boxShadow: '0 20px 50px -12px rgba(15,23,42,0.25)',
+                    border: '1px solid #e2e8f0',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: '#1e293b' }}>
+                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#f87171' }} />
+                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#fbbf24' }} />
+                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#4ade80' }} />
+                    </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={f.image} alt={f.title} style={{ width: '100%', display: 'block' }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FEATURES GRID (supporting) ─── */}
+      <section style={{ padding: '40px 20px 80px', background: 'white' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 22 }}>
+            {gridFeatures.map((f) => (
+              <div key={f.title} style={{ background: '#fafbff', border: '1px solid #e8ecf5', borderRadius: 16, overflow: 'hidden', transition: 'box-shadow 0.15s' }}>
+                {f.image ? (
+                  <div style={{ borderBottom: '1px solid #e8ecf5' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={f.image} alt={f.title} style={{ width: '100%', display: 'block', height: 140, objectFit: 'cover', objectPosition: 'top' }} />
+                  </div>
+                ) : (
+                  <div style={{ height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg,#1e1b4b,#312e81)' }}>
+                    <span style={{ fontSize: 40 }}>🔒</span>
+                  </div>
+                )}
+                <div style={{ padding: '18px 20px 22px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 16 }}>{f.icon}</span>
+                    <div style={{ fontWeight: 700, fontSize: 14.5, color: '#1e293b' }}>{f.title}</div>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>{f.desc}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -471,6 +560,11 @@ export default function LandingPage() {
         @media (min-width: 641px) {
           .nav-desktop { display: flex !important; }
           .nav-mobile { display: none !important; }
+        }
+        @media (max-width: 860px) {
+          .showcase-row { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .showcase-row .order-1, .showcase-row .order-2 { order: initial !important; }
+          .showcase-image { order: -1 !important; }
         }
       `}</style>
     </div>
