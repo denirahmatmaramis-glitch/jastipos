@@ -36,14 +36,19 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
   const [matchedCustomer, setMatchedCustomer] = useState<Customer | null>(null);
   const [nameMismatch, setNameMismatch] = useState(false);
   const [parsedName, setParsedName] = useState('');
+  const [addressMismatch, setAddressMismatch] = useState(false);
+  const [parsedAddress, setParsedAddress] = useState('');
+  const [instagramMismatch, setInstagramMismatch] = useState(false);
+  const [parsedInstagram, setParsedInstagram] = useState('');
 
-  const checkPhoneMatch = (phone: string, currentName?: string) => {
+  const checkPhoneMatch = (phone: string, currentName?: string, currentAddress?: string, currentInstagram?: string) => {
     const clean = phone.replace(/\D/g, '');
     if (clean.length >= 4) {
       const found = customers.find(c => c.phone.replace(/\D/g, '') === clean);
       if (found) {
         setMatchedCustomer(found);
-        const nameToCheck = currentName || d.name;
+
+        const nameToCheck = currentName ?? d.name;
         if (nameToCheck && nameToCheck.trim().toLowerCase() !== found.name.trim().toLowerCase()) {
           setNameMismatch(true);
           setParsedName(nameToCheck);
@@ -52,17 +57,41 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
           setParsedName('');
         }
         onDraftField('name', found.name);
-        // Alamat & Instagram cuma diisi otomatis kalau kolomnya masih kosong — supaya
-        // data yang sudah diketik manual atau hasil parse AI (mis. alamat kirim berbeda
-        // untuk order ini) tidak ketiban diam-diam oleh data lama customer.
-        if (!d.address.trim()) onDraftField('address', found.address);
-        if (!d.instagram.trim()) onDraftField('instagram', found.instagram);
+
+        // Alamat & Instagram: kalau kolom masih kosong, isi otomatis dari data tersimpan.
+        // Kalau sudah keisi (manual atau hasil parse AI) dan berbeda, tampilkan banner
+        // konfirmasi — jangan ditimpa diam-diam.
+        const addressToCheck = currentAddress ?? d.address;
+        const addressDiffers = !!(addressToCheck?.trim() && found.address?.trim() && addressToCheck.trim().toLowerCase() !== found.address.trim().toLowerCase());
+        if (addressDiffers) {
+          setAddressMismatch(true);
+          setParsedAddress(addressToCheck!.trim());
+        } else {
+          setAddressMismatch(false);
+          setParsedAddress('');
+          if (!d.address.trim()) onDraftField('address', found.address);
+        }
+
+        const instagramToCheck = currentInstagram ?? d.instagram;
+        const instagramDiffers = !!(instagramToCheck?.trim() && found.instagram?.trim() && instagramToCheck.trim().toLowerCase() !== found.instagram.trim().toLowerCase());
+        if (instagramDiffers) {
+          setInstagramMismatch(true);
+          setParsedInstagram(instagramToCheck!.trim());
+        } else {
+          setInstagramMismatch(false);
+          setParsedInstagram('');
+          if (!d.instagram.trim()) onDraftField('instagram', found.instagram);
+        }
         return;
       }
     }
     setMatchedCustomer(null);
     setNameMismatch(false);
     setParsedName('');
+    setAddressMismatch(false);
+    setParsedAddress('');
+    setInstagramMismatch(false);
+    setParsedInstagram('');
   };
 
   const handlePhoneChange = (val: string) => {
@@ -79,11 +108,24 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
     if (matchedCustomer) onDraftField('name', matchedCustomer.name);
     setNameMismatch(false);
   };
+
+  const useNewAddress = () => setAddressMismatch(false);
+  const keepExistingAddress = () => {
+    if (matchedCustomer) onDraftField('address', matchedCustomer.address);
+    setAddressMismatch(false);
+  };
+
+  const useNewInstagram = () => setInstagramMismatch(false);
+  const keepExistingInstagram = () => {
+    if (matchedCustomer) onDraftField('instagram', matchedCustomer.instagram);
+    setInstagramMismatch(false);
+  };
+
   // After AI parse, check if phone matches existing customer
   const prevParsed = useRef(parsed);
   useEffect(() => {
     if (parsed && !prevParsed.current && d.phone) {
-      checkPhoneMatch(d.phone, d.name);
+      checkPhoneMatch(d.phone, d.name, d.address, d.instagram);
     }
     prevParsed.current = parsed;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -189,6 +231,30 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
                 <div className="flex gap-2">
                   <button onClick={keepExistingName} className="flex-1 py-2 border border-[#d1fae5] bg-[#ecfdf5] text-[#059669] rounded-[9px] text-[11px] font-bold cursor-pointer">Pakai &quot;{matchedCustomer.name}&quot;</button>
                   <button onClick={useNewName} className="flex-1 py-2 border border-[#c7d2fe] bg-[#eef2ff] text-[#4f46e5] rounded-[9px] text-[11px] font-bold cursor-pointer">Ganti ke &quot;{parsedName}&quot;</button>
+                </div>
+              </div>
+            )}
+            {matchedCustomer && addressMismatch && (
+              <div className="md:col-span-full bg-[#fffbeb] border border-[#fde68a] rounded-[11px] p-3">
+                <div className="text-[12px] text-[#92400e] font-bold mb-1">Alamat berbeda untuk nomor ini</div>
+                <div className="text-[11.5px] text-[#92400e] leading-relaxed mb-2">
+                  Terdaftar: <b>{matchedCustomer.address || '-'}</b> · Kali ini: <b>{parsedAddress}</b>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={keepExistingAddress} className="flex-1 py-2 border border-[#d1fae5] bg-[#ecfdf5] text-[#059669] rounded-[9px] text-[11px] font-bold cursor-pointer">Pakai &quot;{matchedCustomer.address}&quot;</button>
+                  <button onClick={useNewAddress} className="flex-1 py-2 border border-[#c7d2fe] bg-[#eef2ff] text-[#4f46e5] rounded-[9px] text-[11px] font-bold cursor-pointer">Pakai &quot;{parsedAddress}&quot;</button>
+                </div>
+              </div>
+            )}
+            {matchedCustomer && instagramMismatch && (
+              <div className="md:col-span-full bg-[#fffbeb] border border-[#fde68a] rounded-[11px] p-3">
+                <div className="text-[12px] text-[#92400e] font-bold mb-1">Instagram berbeda untuk nomor ini</div>
+                <div className="text-[11.5px] text-[#92400e] leading-relaxed mb-2">
+                  Terdaftar: <b>{matchedCustomer.instagram || '-'}</b> · Kali ini: <b>{parsedInstagram}</b>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={keepExistingInstagram} className="flex-1 py-2 border border-[#d1fae5] bg-[#ecfdf5] text-[#059669] rounded-[9px] text-[11px] font-bold cursor-pointer">Pakai &quot;{matchedCustomer.instagram}&quot;</button>
+                  <button onClick={useNewInstagram} className="flex-1 py-2 border border-[#c7d2fe] bg-[#eef2ff] text-[#4f46e5] rounded-[9px] text-[11px] font-bold cursor-pointer">Pakai &quot;{parsedInstagram}&quot;</button>
                 </div>
               </div>
             )}
