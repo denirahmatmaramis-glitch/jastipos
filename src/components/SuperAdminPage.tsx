@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 
-const NOW = NOW;
+const NOW = Date.now();
 
 interface AdminUser {
   id: string;

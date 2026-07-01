@@ -17,7 +17,7 @@ interface Props {
   onToast: (m: string) => void;
 }
 
-const NOW = NOW;
+const NOW = Date.now();
 
 const proFeatures = [
   'Order tak terbatas (lepas dari batas 10 order)',
