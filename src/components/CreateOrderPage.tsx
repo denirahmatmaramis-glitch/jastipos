@@ -20,6 +20,7 @@ interface Props {
   onAddItem: () => void;
   onRemoveItem: (idx: number) => void;
   onSave: () => void;
+  savingOrder: boolean;
   feeSummary: string;
   onAutoFee: () => void;
   onToast: (m: string) => void;
@@ -30,7 +31,7 @@ const inpCls = "w-full py-2.5 px-3 border border-[#e2e8f0] rounded-[10px] text-[
 const lblSmCls = "block text-[11.5px] font-semibold text-[#64748b] mb-1";
 const inpSmCls = "w-full py-2 px-2.5 border border-[#e2e8f0] rounded-[9px] text-[13px] outline-none bg-white";
 
-export default function CreateOrderPage({ draft, batches, customers, chatText, parsing, parsed, onChatInput, onParseChat, onDraftField, onItemField, onAddItem, onRemoveItem, onSave, feeSummary, onAutoFee, onToast }: Props) {
+export default function CreateOrderPage({ draft, batches, customers, chatText, parsing, parsed, onChatInput, onParseChat, onDraftField, onItemField, onAddItem, onRemoveItem, onSave, savingOrder, feeSummary, onAutoFee, onToast }: Props) {
   const d = draft;
   const [matchedCustomer, setMatchedCustomer] = useState<Customer | null>(null);
   const [nameMismatch, setNameMismatch] = useState(false);
@@ -51,8 +52,11 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
           setParsedName('');
         }
         onDraftField('name', found.name);
-        onDraftField('address', found.address);
-        onDraftField('instagram', found.instagram);
+        // Alamat & Instagram cuma diisi otomatis kalau kolomnya masih kosong — supaya
+        // data yang sudah diketik manual atau hasil parse AI (mis. alamat kirim berbeda
+        // untuk order ini) tidak ketiban diam-diam oleh data lama customer.
+        if (!d.address.trim()) onDraftField('address', found.address);
+        if (!d.instagram.trim()) onDraftField('instagram', found.instagram);
         return;
       }
     }
@@ -108,7 +112,7 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
               </div>
             </div>
             <textarea value={chatText} onChange={e => onChatInput(e.target.value)} placeholder={"Contoh chat dari WhatsApp:\n\nKak mau ikut jastip ya\nNama: Rina\nHP: 081234567890\nAlamat: Bogor\n\nMau order:\n1. Zara Dress Black size M 499rb\n2. CK Bag Beige 1.250.000"} className="w-full min-h-[120px] md:min-h-[110px] p-3 border-none rounded-[12px] text-[13px] leading-relaxed outline-none resize-y" style={{ background: 'rgba(255,255,255,0.95)' }} />
-            <button onClick={onParseChat} className="mt-3 w-full inline-flex items-center justify-center gap-2 py-[11px] border-none rounded-[11px] text-[#4f46e5] text-[13.5px] font-bold cursor-pointer bg-white transition-colors">
+            <button onClick={onParseChat} disabled={parsing} className="mt-3 w-full inline-flex items-center justify-center gap-2 py-[11px] border-none rounded-[11px] text-[#4f46e5] text-[13.5px] font-bold cursor-pointer bg-white transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
               {parsing ? <span className="w-[15px] h-[15px] border-2 border-[#4f46e5]/30 border-t-[#4f46e5] rounded-full inline-block animate-[spin_.7s_linear_infinite]" /> : <SparkleIcon />}
               {parsing ? 'AI sedang membaca...' : 'Baca Chat dengan AI'}
             </button>
@@ -140,17 +144,36 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
             </div>
             <div className="md:col-span-full">
               <label className={lblCls}>Batch Jastip <span className="text-[#ef4444]">*</span></label>
-              {batches.length > 0 ? (
-                <select value={d.batchId} onChange={e => onDraftField('batchId', e.target.value)} className={inpCls} style={{ borderColor: !d.batchId ? '#fca5a5' : undefined }}>
-                  <option value="">— Pilih batch —</option>
-                  {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                </select>
-              ) : (
-                <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[11px] p-3 text-[12px] text-[#92400e]">
-                  Belum ada batch. <button onClick={() => onToast('Buat batch dulu di menu Batch Jastip')} className="bg-transparent border-none text-[#4f46e5] font-bold cursor-pointer p-0 underline">Buat batch jastip</button> terlebih dahulu.
-                </div>
-              )}
-              {!d.batchId && batches.length > 0 && <p className="m-0 mt-1 text-[10px] text-[#ef4444]">Wajib pilih batch jastip</p>}
+              {(() => {
+                // Order baru hanya boleh masuk batch yang masih "Open" — batch yang sudah
+                // Closed/Completed tidak boleh menerima order baru lagi.
+                const openBatches = batches.filter(b => b.status === 'Open');
+                const selectable = d.batchId && !openBatches.some(b => b.id === d.batchId)
+                  ? [...openBatches, ...batches.filter(b => b.id === d.batchId)]
+                  : openBatches;
+
+                if (batches.length === 0) {
+                  return (
+                    <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[11px] p-3 text-[12px] text-[#92400e]">
+                      Belum ada batch. <button onClick={() => onToast('Buat batch dulu di menu Batch Jastip')} className="bg-transparent border-none text-[#4f46e5] font-bold cursor-pointer p-0 underline">Buat batch jastip</button> terlebih dahulu.
+                    </div>
+                  );
+                }
+                if (selectable.length === 0) {
+                  return (
+                    <div className="bg-[#fffbeb] border border-[#fde68a] rounded-[11px] p-3 text-[12px] text-[#92400e]">
+                      Tidak ada batch berstatus &quot;Open&quot; saat ini. <button onClick={() => onToast('Buka status batch dulu di menu Batch Jastip')} className="bg-transparent border-none text-[#4f46e5] font-bold cursor-pointer p-0 underline">Cek Batch Jastip</button>.
+                    </div>
+                  );
+                }
+                return (
+                  <select value={d.batchId} onChange={e => onDraftField('batchId', e.target.value)} className={inpCls} style={{ borderColor: !d.batchId ? '#fca5a5' : undefined }}>
+                    <option value="">— Pilih batch —</option>
+                    {selectable.map(b => <option key={b.id} value={b.id}>{b.name}{b.status !== 'Open' ? ` (${b.status})` : ''}</option>)}
+                  </select>
+                );
+              })()}
+              {!d.batchId && batches.some(b => b.status === 'Open') && <p className="m-0 mt-1 text-[10px] text-[#ef4444]">Wajib pilih batch jastip</p>}
             </div>
             {matchedCustomer && !nameMismatch && (
               <div className="md:col-span-full bg-[#ecfdf5] border border-[#a7f3d0] rounded-[11px] p-3 text-[12px] text-[#047857]">
@@ -262,7 +285,9 @@ export default function CreateOrderPage({ draft, batches, customers, chatText, p
         </div>
 
         {/* Save buttons */}
-        <button onClick={onSave} className="py-3 md:py-[13px] border-none rounded-[12px] md:rounded-xl text-white text-[14px] font-bold cursor-pointer transition-colors" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)' }}>Simpan Order</button>
+        <button onClick={onSave} disabled={savingOrder} className="py-3 md:py-[13px] border-none rounded-[12px] md:rounded-xl text-white text-[14px] font-bold cursor-pointer transition-colors disabled:opacity-70 disabled:cursor-not-allowed" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)' }}>
+          {savingOrder ? 'Menyimpan...' : 'Simpan Order'}
+        </button>
       </div>
     </div>
   );

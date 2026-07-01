@@ -65,6 +65,8 @@ export default function JastipApp() {
   const [authLoading, setAuthLoading] = useState(false);
   const [, setRouteHistory] = useState<Route[]>([]);
   const [appLoading, setAppLoading] = useState(supabaseConfigured);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const savingOrderRef = useRef(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toast = useCallback((m: string) => {
@@ -395,7 +397,9 @@ export default function JastipApp() {
             })}
             onAddItem={() => setState(s => ({ ...s, draft: applyFeesToDraft({ ...s.draft, items: [...s.draft.items, emptyItem()] }, s.globalFee, s.batches) }))}
             onRemoveItem={idx => setState(s => ({ ...s, draft: { ...s.draft, items: s.draft.items.filter((_, i) => i !== idx) } }))}
-            onSave={() => {
+            savingOrder={savingOrder}
+            onSave={async () => {
+              if (savingOrderRef.current) return;
               if (!state.draft.name || !state.draft.phone) { toast('Nama & No WhatsApp wajib diisi'); return; }
               if (!state.draft.batchId) { toast('Batch jastip wajib dipilih'); return; }
               if (!state.draft.items.length) { toast('Minimal 1 produk'); return; }
@@ -403,13 +407,29 @@ export default function JastipApp() {
               if (emptyProduct) { toast('Nama produk wajib diisi semua'); return; }
               const zeroPrice = state.draft.items.find(it => it.priceInIdr <= 0);
               if (zeroPrice) { toast('Harga produk wajib diisi (tidak boleh 0)'); return; }
+              const zeroQty = state.draft.items.find(it => !it.qty || it.qty <= 0);
+              if (zeroQty) { toast('Qty produk wajib diisi minimal 1'); return; }
               if (state.plan === 'free' && state.orders.length >= FREE_ORDER_LIMIT) { nav('upgrade'); return; }
+
+              savingOrderRef.current = true;
+              setSavingOrder(true);
+
+              const localInvoiceNo = () => {
+                const maxNo = state.orders.reduce((m, o) => Math.max(m, parseInt(o.invoiceNo.replace(/\D/g, ''), 10) || 0), 0);
+                return 'INV-' + String(maxNo + 1).padStart(6, '0');
+              };
+              // Ambil nomor invoice dari server saat login (hindari tabrakan lintas tab/device);
+              // fallback ke hitungan lokal untuk demo mode atau saat server tidak terjangkau.
+              let invoiceNo: string;
+              try {
+                invoiceNo = userId ? await db.getNextInvoiceNo(userId) : localInvoiceNo();
+              } catch {
+                invoiceNo = localInvoiceNo();
+              }
 
               const batchName = state.batches.find(b => b.id === state.draft.batchId)?.name || '';
               const totals = calcOrderTotals(state.draft.items);
               const token = Array.from({ length: 11 }, () => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 62)]).join('');
-              const maxNo = state.orders.reduce((m, o) => Math.max(m, parseInt(o.invoiceNo.replace(/\D/g, ''), 10) || 0), 0);
-              const invoiceNo = 'INV-' + String(maxNo + 1).padStart(6, '0');
 
               const draftOrder: Order = {
                 orderId: 'temp-' + Date.now(),
@@ -458,7 +478,11 @@ export default function JastipApp() {
               });
 
               toast('Order tersimpan & invoice dibuat ✓');
-              setTimeout(() => nav('orders'), 700);
+              setTimeout(() => {
+                savingOrderRef.current = false;
+                setSavingOrder(false);
+                nav('orders');
+              }, 700);
             }}
             feeSummary={(() => {
               const b = state.batches.find(x => x.id === state.draft.batchId);
