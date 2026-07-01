@@ -94,35 +94,38 @@ export function buildSteps(status: string, dpPercent: number) {
   });
 }
 
+// Status pembayaran dihitung murni dari riwayat pembayaran (jenis + nominal) — tidak bisa diubah manual.
+export function computePaymentStatus(order: Order): string {
+  const hasRefund = order.payments.some(p => p.type === 'Refund');
+  if (hasRefund) return 'Refund';
+
+  const isDpMethod = order.dpPercent < 100;
+  const dpRequired = isDpMethod ? Math.round(order.totalAmount * order.dpPercent / 100) : order.totalAmount;
+  const sumDP = order.payments.filter(p => p.type === 'DP').reduce((s, p) => s + p.amount, 0);
+
+  // Lunas: total dibayar (semua jenis non-refund, termasuk ongkir) sudah menutup total order.
+  if (order.totalAmount > 0 && order.paidAmount >= order.totalAmount) return 'Lunas';
+
+  if (isDpMethod) {
+    return sumDP >= dpRequired && dpRequired > 0 ? 'DP Diterima' : 'Menunggu DP';
+  }
+  return 'Menunggu Pelunasan';
+}
+
 export function autoOrderStatus(order: Order): { orderStatus: string; paymentStatus: string } {
-  let { orderStatus, paymentStatus } = order;
+  const paymentStatus = computePaymentStatus(order);
   const allBought = order.items.length > 0 && order.items.every(it => it.purchaseStatus === 'Sudah Dibeli');
 
-  if (orderStatus === 'Cancel/Refund' || orderStatus === 'Selesai' || orderStatus === 'Dikirim ke Customer') {
-    return { orderStatus, paymentStatus };
+  // Tahap order (packing/kirim/selesai/batal) yang sudah dimajukan manual tidak boleh ditimpa otomatis.
+  if (order.orderStatus === 'Cancel/Refund' || order.orderStatus === 'Selesai' || order.orderStatus === 'Dikirim ke Customer') {
+    return { orderStatus: order.orderStatus, paymentStatus };
   }
 
-  if (order.remainingAmount <= 0 && order.paidAmount > 0) {
-    paymentStatus = 'Lunas';
-    if (allBought) {
-      orderStatus = 'Sudah Dibeli';
-    } else {
-      orderStatus = 'Menunggu Pembelian';
-    }
-  } else if (order.paidAmount > 0 && order.remainingAmount > 0) {
-    if (order.dpPercent >= 100) {
-      paymentStatus = 'Menunggu Pelunasan';
-      orderStatus = 'Menunggu Pelunasan';
-    } else {
-      paymentStatus = order.paidAmount >= Math.round(order.totalAmount * order.dpPercent / 100) ? 'Menunggu Pelunasan' : 'DP Diterima';
-      orderStatus = paymentStatus === 'Menunggu Pelunasan' ? 'Menunggu Pelunasan' : 'DP Diterima';
-    }
-  }
-
-  if (paymentStatus === 'Lunas' && allBought) {
-    orderStatus = 'Sudah Dibeli';
-  } else if (paymentStatus === 'Lunas' && !allBought) {
-    orderStatus = 'Menunggu Pembelian';
+  let orderStatus = order.orderStatus;
+  if (paymentStatus === 'Lunas') {
+    orderStatus = allBought ? 'Sudah Dibeli' : 'Menunggu Pembelian';
+  } else if (paymentStatus !== 'Refund') {
+    orderStatus = paymentStatus; // 'Menunggu DP' | 'DP Diterima' | 'Menunggu Pelunasan'
   }
 
   return { orderStatus, paymentStatus };

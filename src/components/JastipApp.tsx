@@ -411,7 +411,7 @@ export default function JastipApp() {
               const maxNo = state.orders.reduce((m, o) => Math.max(m, parseInt(o.invoiceNo.replace(/\D/g, ''), 10) || 0), 0);
               const invoiceNo = 'INV-' + String(maxNo + 1).padStart(6, '0');
 
-              const newOrder: Order = {
+              const draftOrder: Order = {
                 orderId: 'temp-' + Date.now(),
                 invoiceNo,
                 trackingToken: token,
@@ -432,6 +432,8 @@ export default function JastipApp() {
                 ...totals,
                 remainingAmount: totals.totalAmount - (state.draft.paid || 0),
               };
+              const { orderStatus: initOrderStatus, paymentStatus: initPaymentStatus } = autoOrderStatus(draftOrder);
+              const newOrder: Order = { ...draftOrder, orderStatus: initOrderStatus, paymentStatus: initPaymentStatus };
 
               // Update customer or create new
               const phone = state.draft.phone.replace(/\D/g, '');
@@ -500,7 +502,7 @@ export default function JastipApp() {
                 if (order) {
                   const paidAmount = Math.max(0, order.paidAmount + (isRefund ? -amt : amt));
                   const remainingAmount = order.orderStatus === 'Cancel/Refund' ? 0 : order.totalAmount - paidAmount;
-                  const updated = { ...order, paidAmount, remainingAmount };
+                  const updated = { ...order, paidAmount, remainingAmount, payments: [...order.payments, payment] };
                   const { orderStatus, paymentStatus } = autoOrderStatus(updated);
                   await db.updateOrderFields(oid, { paidAmount, remainingAmount, paymentStatus, orderStatus });
                 }

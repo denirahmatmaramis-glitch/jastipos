@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Order, Batch, DetailTab, OrderItem } from '@/lib/types';
-import { rp, dt, payBadge, ordBadge, buildSteps, buildInvoiceText, waLink, copyText, itemSubtotal, emptyItem, PAY_STATUSES, ORDER_STATUSES } from '@/lib/utils';
+import { rp, dt, payBadge, ordBadge, buildSteps, buildInvoiceText, waLink, copyText, itemSubtotal, emptyItem, ORDER_STATUSES } from '@/lib/utils';
 import { downloadInvoicePdf } from '@/lib/export';
 import { LinkIcon } from '@/lib/icons';
 import NumInput from './NumInput';
@@ -232,9 +232,10 @@ export default function OrderDetailPage({ order: o, tab, onSetTab, payForm, onPa
             <div className="bg-white border border-[#eef0f6] rounded-2xl p-5">
               <h3 className="m-0 mb-3.5 text-[15px] font-bold">Ubah Status</h3>
               <label className={lblCls}>Status Pembayaran</label>
-              <select value={o.paymentStatus} onChange={e => onOrderFieldChange('paymentStatus', e.target.value)} className={inpCls}>
-                {PAY_STATUSES.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
+              <div className="flex items-center gap-2 py-2.5 px-3 border border-[#e2e8f0] rounded-[10px] bg-[#f8fafc]">
+                <span className="py-[3px] px-2.5 rounded-md text-xs font-bold" style={{ background: pBg, color: pC }}>{o.paymentStatus}</span>
+                <span className="text-[11px] text-[#94a3b8]">Otomatis dari riwayat pembayaran</span>
+              </div>
               <label className={`${lblCls} mt-3`}>Status Order</label>
               <select value={o.orderStatus} onChange={e => onOrderFieldChange('orderStatus', e.target.value)} className={inpCls}>
                 {ORDER_STATUSES.map(os => <option key={os} value={os}>{os}</option>)}
