@@ -42,6 +42,8 @@ export interface Profile {
   upgrade_amount: number;
   upgrade_code: string;
   fee_config: FeeConfig;
+  pro_start_date: string | null;
+  pro_end_date: string | null;
 }
 
 export async function getProfile(userId: string): Promise<Profile | null> {
@@ -281,4 +283,11 @@ export async function getNextInvoiceNo(ownerId: string): Promise<string> {
   const last = data?.[0]?.invoice_no || 'INV-000000';
   const num = parseInt(last.replace(/\D/g, ''), 10) || 0;
   return 'INV-' + String(num + 1).padStart(6, '0');
+}
+
+// ===== Feedback =====
+
+export async function insertFeedback(userId: string, userEmail: string, category: string, message: string) {
+  const { error } = await supabase.from('feedback').insert({ user_id: userId, user_email: userEmail, category, message });
+  if (error) throw error;
 }

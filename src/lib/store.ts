@@ -99,6 +99,8 @@ export interface AppState {
   plan: Plan;
   upgradeStatus: UpgradeStatus;
   upgradeCode: string;
+  proStartDate: string;
+  proEndDate: string;
 }
 
 export const initialState: AppState = {
@@ -124,4 +126,6 @@ export const initialState: AppState = {
   plan: 'free',
   upgradeStatus: 'none',
   upgradeCode: String(Math.floor(100 + Math.random() * 900)),
+  proStartDate: '',
+  proEndDate: '',
 };

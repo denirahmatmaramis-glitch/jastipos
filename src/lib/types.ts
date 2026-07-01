@@ -104,7 +104,7 @@ export interface Draft {
   items: OrderItem[];
 }
 
-export type Route = 'dashboard' | 'customers' | 'batches' | 'orders' | 'create' | 'detail' | 'payments' | 'reports' | 'fees' | 'templates' | 'track' | 'upgrade' | 'admin' | 'store-settings';
+export type Route = 'dashboard' | 'customers' | 'batches' | 'orders' | 'create' | 'detail' | 'payments' | 'reports' | 'fees' | 'templates' | 'track' | 'upgrade' | 'admin' | 'store-settings' | 'feedback';
 
 export type DetailTab = 'produk' | 'bayar' | 'timeline' | 'invoice' | 'link' | 'resi';
 

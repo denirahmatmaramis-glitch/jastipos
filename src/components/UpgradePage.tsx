@@ -11,9 +11,13 @@ interface Props {
   upgradeStatus: UpgradeStatus;
   upgradeCode: string;
   bankInfo: string;
+  proStartDate?: string;
+  proEndDate?: string;
   onConfirmTransfer: (senderName: string, amount: number) => void;
   onToast: (m: string) => void;
 }
+
+const NOW = NOW;
 
 const proFeatures = [
   'Order tak terbatas (lepas dari batas 10 order)',
@@ -21,17 +25,45 @@ const proFeatures = [
   'Prioritas dukungan & update fitur baru',
 ];
 
-export default function UpgradePage({ plan, orderCount, upgradeStatus, upgradeCode, bankInfo, onConfirmTransfer, onToast }: Props) {
+export default function UpgradePage({ plan, orderCount, upgradeStatus, upgradeCode, bankInfo, proStartDate, proEndDate, onConfirmTransfer, onToast }: Props) {
   const [senderName, setSenderName] = useState('');
   const uniqueNominal = PRO_PRICE - (PRO_PRICE % 1000) + Number(upgradeCode);
 
+  const fmtDate = (d?: string) => {
+    if (!d) return '-';
+    return new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+
   if (plan === 'pro') {
+    const daysLeft = proEndDate ? Math.ceil((new Date(proEndDate).getTime() - NOW) / 86400000) : null;
+    const isExpiringSoon = daysLeft !== null && daysLeft <= 7;
     return (
       <div className="max-w-[520px]">
         <div className="bg-white border border-[#eef0f6] rounded-2xl p-8 text-center">
           <div className="text-[44px] mb-2">🎉</div>
           <h2 className="m-0 text-[19px] font-extrabold">Kamu sudah Pro!</h2>
-          <p className="mt-2 mb-0 text-[#64748b] text-[13.5px]">Semua fitur terbuka dan order kamu tak terbatas. Terima kasih sudah upgrade.</p>
+          <p className="mt-2 mb-5 text-[#64748b] text-[13.5px]">Semua fitur terbuka dan order kamu tak terbatas. Terima kasih sudah upgrade.</p>
+          {(proStartDate || proEndDate) && (
+            <div className={`rounded-[14px] border p-4 text-left ${isExpiringSoon ? 'bg-[#fffbeb] border-[#fde68a]' : 'bg-[#f8fafc] border-[#e2e8f0]'}`}>
+              <div className="grid grid-cols-2 gap-y-2 text-[13px]">
+                <span className="text-[#94a3b8] font-medium">Mulai berlangganan</span>
+                <span className="font-semibold text-[#1e293b]">{fmtDate(proStartDate)}</span>
+                <span className="text-[#94a3b8] font-medium">Berakhir</span>
+                <span className={`font-semibold ${isExpiringSoon ? 'text-[#b45309]' : 'text-[#1e293b]'}`}>{fmtDate(proEndDate)}</span>
+                {daysLeft !== null && (
+                  <>
+                    <span className="text-[#94a3b8] font-medium">Sisa</span>
+                    <span className={`font-semibold ${isExpiringSoon ? 'text-[#b45309]' : 'text-[#16a34a]'}`}>
+                      {daysLeft <= 0 ? 'Sudah berakhir' : `${daysLeft} hari`}
+                    </span>
+                  </>
+                )}
+              </div>
+              {isExpiringSoon && daysLeft !== null && daysLeft > 0 && (
+                <div className="mt-2.5 text-[12px] text-[#92400e]">⚠️ Perpanjang langganan kamu agar tidak balik ke Free.</div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );

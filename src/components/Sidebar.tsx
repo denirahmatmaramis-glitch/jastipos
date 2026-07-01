@@ -5,6 +5,10 @@ import { FREE_ORDER_LIMIT } from '@/lib/store';
 import { LogoIcon, LogoutIcon, DashboardIcon, CustomersIcon, BatchesIcon, OrdersIcon, CreateIcon, PaymentsIcon, ReportsIcon, FeesIcon, TemplatesIcon, StoreIcon } from '@/lib/icons';
 import { ReactNode, useState } from 'react';
 
+function FeedbackIcon() {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>;
+}
+
 const navDef: [Route | 'create', string, () => ReactNode][] = [
   ['dashboard', 'Dashboard', DashboardIcon],
   ['customers', 'Customer', CustomersIcon],
@@ -16,6 +20,7 @@ const navDef: [Route | 'create', string, () => ReactNode][] = [
   ['fees', 'Setting Fee', FeesIcon],
   ['templates', 'Template WhatsApp', TemplatesIcon],
   ['store-settings', 'Pengaturan Toko', StoreIcon],
+  ['feedback', 'Feedback & Saran', FeedbackIcon],
 ];
 
 const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '';
@@ -124,6 +129,7 @@ const moreMenuItems: [Route, string, () => ReactNode][] = [
   ['store-settings', 'Pengaturan Toko', StoreIcon],
   ['payments', 'Pembayaran', PaymentsIcon],
   ['reports', 'Laporan', ReportsIcon],
+  ['feedback', 'Feedback', FeedbackIcon],
   ['upgrade', 'Upgrade Pro', () => <span className="text-[16px]">⭐</span>],
   ['admin', 'Super Admin', AdminIcon],
 ];

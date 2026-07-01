@@ -24,8 +24,10 @@ import TemplatesPage from './TemplatesPage';
 import UpgradePage from './UpgradePage';
 import SuperAdminPage from './SuperAdminPage';
 import StoreSettingsPage from './StoreSettingsPage';
+import FeedbackPage from './FeedbackPage';
 
 const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '';
+const NOW = Date.now();
 
 const titles: Record<string, [string, string]> = {
   dashboard: ['Dashboard', 'Ringkasan operasional jastip kamu hari ini'],
@@ -41,6 +43,7 @@ const titles: Record<string, [string, string]> = {
   upgrade: ['Upgrade ke Pro', 'Buka order tak terbatas & semua fitur'],
   admin: ['Panel Admin', 'Verifikasi pembayaran & aktivasi Pro'],
   'store-settings': ['Pengaturan Toko', 'Nama toko & info rekening invoice'],
+  feedback: ['Feedback & Saran', 'Kirim masukan, bug report, atau pertanyaan ke admin'],
 };
 
 const emptyState: AppState = {
@@ -51,6 +54,7 @@ const emptyState: AppState = {
   globalFee: defaultFeeConfig(), customers: [], batches: [], orders: [],
   storeName: 'Toko Jastip Kamu', bankInfo: '',
   plan: 'free', upgradeStatus: 'none', upgradeCode: String(Math.floor(100 + Math.random() * 900)),
+  proStartDate: '', proEndDate: '',
 };
 
 export default function JastipApp() {
@@ -91,6 +95,8 @@ export default function JastipApp() {
         globalFee: profile?.fee_config || defaultFeeConfig(),
         plan: (profile?.plan || 'free') as 'free' | 'pro',
         upgradeStatus: (profile?.upgrade_status || 'none') as 'none' | 'pending' | 'active',
+        proStartDate: profile?.pro_start_date || '',
+        proEndDate: profile?.pro_end_date || '',
       }));
     } catch (e) {
       console.error('Failed to load data:', e);
@@ -250,6 +256,23 @@ export default function JastipApp() {
       <Sidebar route={state.route} onNav={nav} onLogout={handleLogout} plan={state.plan} orderCount={state.orders.length} userEmail={userEmail} />
 
       <main className="jp-scroll flex-1 min-w-0 p-[26px_30px] max-md:p-[14px_14px_80px] max-h-screen overflow-y-auto">
+        {/* Renewal notification banner */}
+        {state.plan === 'pro' && state.proEndDate && (() => {
+          const daysLeft = Math.ceil((new Date(state.proEndDate).getTime() - NOW) / 86400000);
+          if (daysLeft > 7) return null;
+          return (
+            <div className="flex items-center gap-3 bg-[#fffbeb] border border-[#fde68a] rounded-[14px] p-3.5 mb-4 text-[12.5px] text-[#92400e]">
+              <span className="text-[18px] shrink-0">⚠️</span>
+              <div className="flex-1">
+                <b>{daysLeft <= 0 ? 'Langganan Pro kamu sudah berakhir!' : `Langganan Pro berakhir dalam ${daysLeft} hari!`}</b>
+                {' '}Segera perpanjang agar tidak balik ke paket Free.
+              </div>
+              <button onClick={() => nav('upgrade')} className="shrink-0 bg-[#f59e0b] text-white border-none rounded-lg px-3 py-1.5 text-[12px] font-bold cursor-pointer hover:bg-[#d97706] transition-colors">
+                Perpanjang
+              </button>
+            </div>
+          );
+        })()}
         <div className="flex items-start justify-between gap-3 mb-4 md:mb-[22px] flex-wrap">
           <div className="flex items-center gap-2">
             {state.route !== 'dashboard' && (
@@ -658,6 +681,8 @@ export default function JastipApp() {
             upgradeStatus={state.upgradeStatus}
             upgradeCode={state.upgradeCode}
             bankInfo={state.bankInfo}
+            proStartDate={state.proStartDate}
+            proEndDate={state.proEndDate}
             onConfirmTransfer={(senderName: string, amount: number) => {
               setState(s => ({ ...s, upgradeStatus: 'pending' }));
               if (userId) persist(() => db.updateProfile(userId, { upgrade_status: 'pending', upgrade_sender_name: senderName, upgrade_amount: amount, upgrade_code: state.upgradeCode } as Record<string, unknown>));
@@ -677,6 +702,10 @@ export default function JastipApp() {
             }}
             onToast={toast}
           />
+        )}
+
+        {state.route === 'feedback' && (
+          <FeedbackPage userId={userId} userEmail={userEmail} onToast={toast} />
         )}
 
         {state.route === 'admin' && userEmail === SUPER_ADMIN_EMAIL && (

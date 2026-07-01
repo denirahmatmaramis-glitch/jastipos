@@ -47,6 +47,8 @@ export async function GET(request: Request) {
       orderCount: orderCount || 0,
       customerCount: customerCount || 0,
       createdAt: p.created_at,
+      proStartDate: p.pro_start_date || null,
+      proEndDate: p.pro_end_date || null,
     });
   }
 
@@ -64,13 +66,48 @@ export async function POST(request: Request) {
   const { action, userId } = body;
 
   if (action === 'activate') {
-    await admin.from('profiles').update({ plan: 'pro', upgrade_status: 'active' }).eq('id', userId);
-    return Response.json({ ok: true, message: 'User diaktifkan ke Pro' });
+    const now = new Date();
+    const endDate = new Date(now);
+    endDate.setDate(endDate.getDate() + 30);
+    await admin.from('profiles').update({
+      plan: 'pro',
+      upgrade_status: 'active',
+      pro_start_date: now.toISOString(),
+      pro_end_date: endDate.toISOString(),
+    }).eq('id', userId);
+    return Response.json({ ok: true, message: 'User diaktifkan ke Pro (30 hari)' });
   }
 
   if (action === 'deactivate') {
-    await admin.from('profiles').update({ plan: 'free', upgrade_status: 'none' }).eq('id', userId);
+    await admin.from('profiles').update({
+      plan: 'free',
+      upgrade_status: 'none',
+      pro_start_date: null,
+      pro_end_date: null,
+    }).eq('id', userId);
     return Response.json({ ok: true, message: 'User dikembalikan ke Free' });
+  }
+
+  if (action === 'delete') {
+    // Hapus dari auth (cascade ke profiles via FK)
+    const { error } = await admin.auth.admin.deleteUser(userId);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    // Hapus manual dari profiles jika tidak ada ON DELETE CASCADE
+    await admin.from('profiles').delete().eq('id', userId);
+    return Response.json({ ok: true, message: 'User berhasil dihapus' });
+  }
+
+  if (action === 'impersonate') {
+    const { email } = body;
+    if (!email) return Response.json({ error: 'Email diperlukan' }, { status: 400 });
+    const { data, error } = await admin.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+    });
+    if (error || !data?.properties?.action_link) {
+      return Response.json({ error: error?.message || 'Gagal membuat link' }, { status: 500 });
+    }
+    return Response.json({ ok: true, link: data.properties.action_link });
   }
 
   return Response.json({ error: 'Unknown action' }, { status: 400 });
