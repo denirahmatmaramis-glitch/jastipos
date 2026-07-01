@@ -42,6 +42,8 @@ export default function OrderDetailPage({ order: o, tab, onSetTab, payForm, onPa
   const [ongkirWeight, setOngkirWeight] = useState(o.weight || 0);
   const [ongkirCost, setOngkirCost] = useState(o.shipCost || 0);
   const canAddItem = !['Dikirim ke Customer', 'Selesai', 'Cancel/Refund'].includes(o.orderStatus);
+  const isCancelled = o.orderStatus === 'Cancel/Refund';
+  const refundTotal = o.payments.filter(p => p.type === 'Refund').reduce((s, p) => s + p.amount, 0);
   const [pBg, pC] = payBadge(o.paymentStatus);
   const [oBg, oC] = ordBadge(o.orderStatus);
   const steps = buildSteps(o.orderStatus, o.dpPercent);
@@ -82,7 +84,11 @@ export default function OrderDetailPage({ order: o, tab, onSetTab, payForm, onPa
           <div className="text-right">
             <div className="text-xs text-[#94a3b8]">Total order</div>
             <div className="text-[26px] font-extrabold text-[#4f46e5] tracking-tight">{rp(o.totalAmount)}</div>
-            <div className="text-xs text-[#94a3b8] mt-[2px]">Sisa: <b className="text-[#d97706]">{rp(o.remainingAmount)}</b></div>
+            {isCancelled ? (
+              <div className="text-xs text-[#94a3b8] mt-[2px]">Refund: <b className="text-[#dc2626]">{refundTotal > 0 ? rp(refundTotal) : 'Belum diproses'}</b></div>
+            ) : (
+              <div className="text-xs text-[#94a3b8] mt-[2px]">Sisa: <b className="text-[#d97706]">{rp(o.remainingAmount)}</b></div>
+            )}
           </div>
         </div>
         <div className="jp-scroll flex gap-1 mt-[18px] border-t border-[#f1f5f9] pt-1.5 overflow-x-auto">
@@ -276,12 +282,16 @@ export default function OrderDetailPage({ order: o, tab, onSetTab, payForm, onPa
           <div className="bg-white border border-[#eef0f6] rounded-2xl mt-4 overflow-hidden">
             <div className="py-4 px-5 border-b border-[#f1f5f9] text-sm font-bold">Riwayat Pembayaran</div>
             {o.payments.map((p, i) => {
+              const isRefundRow = p.type === 'Refund';
               const tag = p.type === 'DP' ? 'DP' : (p.type === 'Pelunasan' ? 'LN' : p.type.slice(0, 2).toUpperCase());
               return (
                 <div key={i} className="flex items-center gap-3.5 py-3.5 px-5 border-t border-[#f8fafc]">
-                  <div className="w-9 h-9 rounded-[9px] bg-[#dcfce7] text-[#15803d] flex items-center justify-center font-extrabold text-xs">{tag}</div>
-                  <div className="flex-1"><div className="text-[13.5px] font-bold">{rp(p.amount)}</div><div className="text-[11.5px] text-[#94a3b8]">{p.method} · {p.date}</div></div>
-                  <span className="py-1 px-[9px] rounded-[7px] text-[11px] font-bold bg-[#eef2ff] text-[#4f46e5]">{p.type}</span>
+                  <div className={`w-9 h-9 rounded-[9px] flex items-center justify-center font-extrabold text-xs ${isRefundRow ? 'bg-[#fee2e2] text-[#b91c1c]' : 'bg-[#dcfce7] text-[#15803d]'}`}>{tag}</div>
+                  <div className="flex-1">
+                    <div className={`text-[13.5px] font-bold ${isRefundRow ? 'text-[#dc2626]' : ''}`}>{isRefundRow ? '− ' : ''}{rp(p.amount)}</div>
+                    <div className="text-[11.5px] text-[#94a3b8]">{p.method} · {p.date}</div>
+                  </div>
+                  <span className={`py-1 px-[9px] rounded-[7px] text-[11px] font-bold ${isRefundRow ? 'bg-[#fee2e2] text-[#b91c1c]' : 'bg-[#eef2ff] text-[#4f46e5]'}`}>{p.type}</span>
                 </div>
               );
             })}
@@ -330,7 +340,11 @@ export default function OrderDetailPage({ order: o, tab, onSetTab, payForm, onPa
               {o.shipCost > 0 && <div className="flex justify-between"><span className="text-[#64748b]">Ongkir</span><b>{rp(o.shipCost)}</b></div>}
               <div className="flex justify-between"><span className="text-[#64748b]">Total Order</span><b>{rp(o.totalAmount)}</b></div>
               <div className="flex justify-between"><span className="text-[#64748b]">Sudah Dibayar</span><b className="text-[#16a34a]">{rp(o.paidAmount)}</b></div>
-              <div className="flex justify-between"><span className="text-[#64748b]">Sisa Pelunasan</span><b className="text-[#d97706]">{rp(o.remainingAmount)}</b></div>
+              {isCancelled ? (
+                <div className="flex justify-between"><span className="text-[#64748b]">Refund</span><b className="text-[#dc2626]">{refundTotal > 0 ? rp(refundTotal) : 'Belum diproses'}</b></div>
+              ) : (
+                <div className="flex justify-between"><span className="text-[#64748b]">Sisa Pelunasan</span><b className="text-[#d97706]">{rp(o.remainingAmount)}</b></div>
+              )}
             </div>
             <div className="mt-4 bg-[#f8fafc] rounded-[10px] p-3 text-[11.5px] text-[#475569] leading-relaxed">Pembayaran: <b>{bankInfo}</b><br />Order yang sudah dibelikan tidak bisa dibatalkan. Pelunasan wajib sebelum barang dikirim.</div>
           </div>

@@ -480,12 +480,13 @@ export default function JastipApp() {
             onAddPayment={() => {
               const amt = +(state.payForm.amount);
               if (!amt) { toast('Isi jumlah bayar'); return; }
+              const isRefund = state.payForm.type === 'Refund';
               const payment = { date: new Date().toISOString().slice(0, 10), amount: amt, method: state.payForm.method, type: state.payForm.type };
               setState(s => {
                 const orders = s.orders.map(o => {
                   if (o.orderId !== s.selectedOrderId) return o;
-                  const paidAmount = o.paidAmount + amt;
-                  const remainingAmount = o.totalAmount - paidAmount;
+                  const paidAmount = Math.max(0, o.paidAmount + (isRefund ? -amt : amt));
+                  const remainingAmount = o.orderStatus === 'Cancel/Refund' ? 0 : o.totalAmount - paidAmount;
                   const updated = { ...o, paidAmount, remainingAmount, payments: [...o.payments, payment] };
                   const { orderStatus, paymentStatus } = autoOrderStatus(updated);
                   return { ...updated, orderStatus, paymentStatus };
@@ -497,8 +498,8 @@ export default function JastipApp() {
                 await db.addPayment(oid, payment);
                 const order = state.orders.find(o => o.orderId === oid);
                 if (order) {
-                  const paidAmount = order.paidAmount + amt;
-                  const remainingAmount = order.totalAmount - paidAmount;
+                  const paidAmount = Math.max(0, order.paidAmount + (isRefund ? -amt : amt));
+                  const remainingAmount = order.orderStatus === 'Cancel/Refund' ? 0 : order.totalAmount - paidAmount;
                   const updated = { ...order, paidAmount, remainingAmount };
                   const { orderStatus, paymentStatus } = autoOrderStatus(updated);
                   await db.updateOrderFields(oid, { paidAmount, remainingAmount, paymentStatus, orderStatus });
@@ -514,11 +515,15 @@ export default function JastipApp() {
                     toast('Tidak bisa dikirim — order belum lunas');
                     return o;
                   }
+                  if (f === 'orderStatus' && v === 'Cancel/Refund') {
+                    return { ...o, orderStatus: v, remainingAmount: 0 };
+                  }
                   return { ...o, [f]: v };
                 });
                 return { ...s, orders };
               });
-              persist(() => db.updateOrderFields(state.selectedOrderId, { [f]: v }));
+              const extra = f === 'orderStatus' && v === 'Cancel/Refund' ? { remainingAmount: 0 } : {};
+              persist(() => db.updateOrderFields(state.selectedOrderId, { [f]: v, ...extra }));
             }}
             onShipFieldChange={(f, v) => {
               setState(s => ({
