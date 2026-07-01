@@ -3,38 +3,57 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-const showcaseFeatures = [
+interface ShowcaseFeature {
+  icon: string;
+  title: string;
+  desc: string;
+  points: string[];
+  images: string[];
+  captions?: string[];
+  reverse: boolean;
+}
+
+const showcaseFeatures: ShowcaseFeature[] = [
+  {
+    icon: '🏠',
+    title: 'Dashboard Real-Time',
+    desc: 'Ringkasan omzet, profit, piutang, dan status order langsung terlihat begitu buka aplikasi. Tidak perlu buka banyak menu untuk tahu kondisi bisnis kamu hari ini.',
+    points: ['Ringkasan omzet, profit & piutang sekali lihat', 'Status order dikelompokkan otomatis: DP, Bayar, Proses, Selesai', 'Daftar order terbaru langsung dari home'],
+    images: ['/screenshots/mobile/dashboard.png'],
+    reverse: false,
+  },
   {
     icon: '💬',
     title: 'Parse Chat WhatsApp AI',
     desc: 'Tempel chat WhatsApp customer, AI langsung baca dan isi form order otomatis — nama, alamat, produk, harga. Tidak perlu ketik manual satu-satu.',
     points: ['Hemat waktu input order hingga 80%', 'AI paham format chat natural bahasa Indonesia', 'Bisa diedit manual kalau ada yang kurang pas'],
-    image: '/screenshots/create-order.png',
-    reverse: false,
+    images: ['/screenshots/mobile/create-order.png'],
+    reverse: true,
   },
   {
     icon: '📦',
     title: 'Manajemen Order Lengkap',
-    desc: 'Semua order jastip kamu dalam satu dashboard rapi. Cari, filter, dan pantau status pembayaran maupun pembelian secara real-time.',
+    desc: 'Semua order jastip kamu dalam satu daftar rapi. Cari, filter, dan pantau status pembayaran maupun pembelian secara real-time.',
     points: ['Filter status: DP, Pelunasan, Sudah Dibeli, dll', 'Pencarian cepat by nama, invoice, atau batch', 'Status order & pembayaran otomatis update'],
-    image: '/screenshots/orders.png',
-    reverse: true,
+    images: ['/screenshots/mobile/orders.png'],
+    reverse: false,
   },
   {
     icon: '🧾',
     title: 'Invoice PDF Otomatis',
     desc: 'Invoice profesional dibuat otomatis dari data order — lengkap dengan rincian produk, subtotal, dan info rekening. Tinggal kirim ke customer.',
     points: ['Download PDF sekali klik', 'Kirim langsung lewat WhatsApp', 'Format rapi & terlihat profesional'],
-    image: '/screenshots/order-invoice.png',
-    reverse: false,
+    images: ['/screenshots/mobile/order-invoice.png'],
+    reverse: true,
   },
   {
     icon: '🔗',
     title: 'Link Tracking Customer',
-    desc: 'Setiap order dapat link unik yang bisa dibuka customer tanpa login. Mereka bisa cek status order sendiri, kapan saja.',
+    desc: 'Setiap order dapat link unik yang bisa dibuka customer tanpa login. Mereka bisa cek status order sendiri, kapan saja — persis seperti resi paket.',
     points: ['Tidak perlu login — cukup buka link', 'Kurangi chat "udah sampai mana kak?"', 'Bisa dikirim otomatis lewat WhatsApp'],
-    image: '/screenshots/order-link.png',
-    reverse: true,
+    images: ['/screenshots/mobile/order-link.png', '/screenshots/mobile/track-preview.png'],
+    captions: ['Kamu kirim link', 'Customer lihat status'],
+    reverse: false,
   },
 ];
 
@@ -43,19 +62,19 @@ const gridFeatures = [
     icon: '💰',
     title: 'Laporan Keuangan',
     desc: 'Pantau omzet, modal, profit, dan piutang otomatis dari semua transaksi — tanpa hitung manual.',
-    image: '/screenshots/reports.png',
+    image: '/screenshots/mobile/reports.png',
   },
   {
     icon: '👥',
     title: 'Database Customer',
     desc: 'Data customer & history order tersimpan rapi. Auto-fill otomatis saat customer lama repeat order.',
-    image: '/screenshots/customers.png',
+    image: '/screenshots/mobile/customers.png',
   },
   {
     icon: '⚙️',
     title: 'Setting Fee Jastip',
     desc: 'Atur skema fee — flat, persen, atau tier harga — sekali setting, berlaku otomatis ke semua order baru.',
-    image: '/screenshots/fees.png',
+    image: '/screenshots/mobile/fees.png',
   },
   {
     icon: '🔒',
@@ -64,6 +83,26 @@ const gridFeatures = [
     image: null,
   },
 ];
+
+function PhoneFrame({ src, alt, maxWidth = 260, className }: { src: string; alt: string; maxWidth?: number; className?: string }) {
+  return (
+    <div className={className} style={{ maxWidth, margin: '0 auto', position: 'relative' }}>
+      <div style={{
+        borderRadius: 34,
+        border: '6px solid #111827',
+        background: '#111827',
+        boxShadow: '0 30px 60px -18px rgba(15,23,42,0.35)',
+        overflow: 'hidden',
+        position: 'relative',
+        lineHeight: 0,
+      }}>
+        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '38%', height: 18, background: '#111827', borderBottomLeftRadius: 12, borderBottomRightRadius: 12, zIndex: 2 }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={alt} style={{ width: '100%', display: 'block' }} />
+      </div>
+    </div>
+  );
+}
 
 const steps = [
   {
@@ -217,12 +256,12 @@ export default function LandingPage() {
             Kelola order, invoice, pembayaran, dan tracking pelanggan — semuanya dalam satu aplikasi. Berhenti pakai catatan manual, mulai pakai JastipOS.
           </p>
 
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/app" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', fontWeight: 700, textDecoration: 'none', padding: '14px 28px', borderRadius: 14, fontSize: 15, boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}>
+          <div className="hero-cta" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', fontWeight: 700, textDecoration: 'none', padding: '14px 28px', borderRadius: 14, fontSize: 15, boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}>
               Mulai Gratis Sekarang
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>
-            <a href="#fitur" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'white', fontWeight: 600, textDecoration: 'none', padding: '14px 24px', borderRadius: 14, fontSize: 15 }}>
+            <a href="#fitur" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'white', fontWeight: 600, textDecoration: 'none', padding: '14px 24px', borderRadius: 14, fontSize: 15 }}>
               Lihat Fitur
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 9l-7 7-7-7"/></svg>
             </a>
@@ -319,21 +358,23 @@ export default function LandingPage() {
                 </div>
 
                 <div className={f.reverse ? 'showcase-image order-1' : 'showcase-image'}>
-                  <div style={{
-                    borderRadius: 16,
-                    overflow: 'hidden',
-                    background: '#0f172a',
-                    boxShadow: '0 20px 50px -12px rgba(15,23,42,0.25)',
-                    border: '1px solid #e2e8f0',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: '#1e293b' }}>
-                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#f87171' }} />
-                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#fbbf24' }} />
-                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#4ade80' }} />
+                  {f.images.length > 1 ? (
+                    <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', justifyContent: 'center' }} className="dual-phone-row">
+                      {f.images.map((img, i) => (
+                        <div key={img} style={{ flex: 1, maxWidth: 190 }} className="dual-phone-item">
+                          <PhoneFrame src={img} alt={`${f.title} ${i + 1}`} maxWidth={190} className="phone-dual" />
+                          {f.captions?.[i] && (
+                            <div style={{ textAlign: 'center', marginTop: 12, fontSize: 12, fontWeight: 700, color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                              <span style={{ width: 18, height: 18, borderRadius: '50%', background: '#eef2ff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10.5 }}>{i + 1}</span>
+                              {f.captions[i]}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={f.image} alt={f.title} style={{ width: '100%', display: 'block' }} />
-                  </div>
+                  ) : (
+                    <PhoneFrame src={f.images[0]} alt={f.title} maxWidth={260} />
+                  )}
                 </div>
               </div>
             ))}
@@ -346,14 +387,13 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 22 }}>
             {gridFeatures.map((f) => (
-              <div key={f.title} style={{ background: '#fafbff', border: '1px solid #e8ecf5', borderRadius: 16, overflow: 'hidden', transition: 'box-shadow 0.15s' }}>
+              <div key={f.title} style={{ background: '#fafbff', border: '1px solid #e8ecf5', borderRadius: 18, overflow: 'hidden', transition: 'box-shadow 0.15s' }}>
                 {f.image ? (
-                  <div style={{ borderBottom: '1px solid #e8ecf5' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={f.image} alt={f.title} style={{ width: '100%', display: 'block', height: 140, objectFit: 'cover', objectPosition: 'top' }} />
+                  <div style={{ borderBottom: '1px solid #e8ecf5', padding: '24px 16px', background: 'linear-gradient(180deg,#eef2ff,#fafbff)', display: 'flex', justifyContent: 'center' }}>
+                    <PhoneFrame src={f.image} alt={f.title} maxWidth={132} />
                   </div>
                 ) : (
-                  <div style={{ height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg,#1e1b4b,#312e81)' }}>
+                  <div style={{ height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg,#1e1b4b,#312e81)' }}>
                     <span style={{ fontSize: 40 }}>🔒</span>
                   </div>
                 )}
@@ -552,6 +592,14 @@ export default function LandingPage() {
         </div>
       </footer>
 
+      {/* ─── MOBILE STICKY CTA ─── */}
+      <div className="mobile-sticky-cta">
+        <Link href="/app" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', fontWeight: 700, textDecoration: 'none', padding: '14px', borderRadius: 14, fontSize: 14.5, boxShadow: '0 8px 24px rgba(99,102,241,0.35)' }}>
+          Coba Gratis Sekarang
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </Link>
+      </div>
+
       <style>{`
         @media (max-width: 640px) {
           .nav-desktop { display: none !important; }
@@ -562,9 +610,36 @@ export default function LandingPage() {
           .nav-mobile { display: none !important; }
         }
         @media (max-width: 860px) {
-          .showcase-row { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .showcase-row { grid-template-columns: 1fr !important; gap: 22px !important; }
           .showcase-row .order-1, .showcase-row .order-2 { order: initial !important; }
           .showcase-image { order: -1 !important; }
+        }
+
+        /* Mobile UX polish */
+        .mobile-sticky-cta { display: none; }
+        @media (max-width: 640px) {
+          section, footer { padding-top: 46px !important; padding-bottom: 46px !important; padding-left: 18px !important; padding-right: 18px !important; }
+          footer { padding-bottom: 108px !important; }
+          h1 { line-height: 1.2 !important; }
+          .hero-cta { flex-direction: column; width: 100%; }
+          .hero-cta a { width: 100%; }
+          .dual-phone-row { gap: 14px !important; }
+          .phone-dual { max-width: 148px !important; }
+          .mobile-sticky-cta {
+            display: block;
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            z-index: 40;
+            padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid #eef0f6;
+            box-shadow: 0 -8px 24px rgba(15,23,42,0.06);
+          }
+        }
+        @media (max-width: 400px) {
+          .phone-dual { max-width: 128px !important; }
         }
       `}</style>
     </div>
