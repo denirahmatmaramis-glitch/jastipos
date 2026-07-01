@@ -105,7 +105,7 @@ export default function SuperAdminPage({ onToast }: Props) {
       const res = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ action: 'impersonate', userId: user.id, email: user.email }),
+        body: JSON.stringify({ action: 'impersonate', userId: user.id, email: user.email, origin: window.location.origin }),
       });
       const json = await res.json();
       if (res.ok && json.link) {

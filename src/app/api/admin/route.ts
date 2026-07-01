@@ -100,9 +100,19 @@ export async function POST(request: Request) {
   if (action === 'impersonate') {
     const { email } = body;
     if (!email) return Response.json({ error: 'Email diperlukan' }, { status: 400 });
+
+    // Tentukan origin produksi supaya magic link tidak balik ke localhost.
+    const origin =
+      (typeof body.origin === 'string' && body.origin) ||
+      request.headers.get('origin') ||
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      '';
+    const redirectTo = origin ? `${origin.replace(/\/$/, '')}/app` : undefined;
+
     const { data, error } = await admin.auth.admin.generateLink({
       type: 'magiclink',
       email,
+      options: redirectTo ? { redirectTo } : undefined,
     });
     if (error || !data?.properties?.action_link) {
       return Response.json({ error: error?.message || 'Gagal membuat link' }, { status: 500 });
